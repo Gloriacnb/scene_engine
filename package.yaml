@@ -1,0 +1,50 @@
+## 第一部分： 基础信息
+name: sample                                        # <必选项> 包名称 （符合C语言变量命名规则），长度少于等于64字节
+version: master                                     # <必选项> 组件版本号
+description: normal component template              # <必选项> 建议至少20字以上
+type: system                                        # <必选项> 组件类型，为：solution, kernel, hardware, components, interface
+
+tag: ''                                             # <必选项> 标签,组件分类，为：common, protocol, language, sdk 缺省值： ''
+keywords:                                           # <可选项> 关键词，会影响到组件被搜索的效果，合理的关键词很重要
+  - sample
+license: Apache license v2.0                        # <可选项> 源代码的许可证，要确保所有代码、文件的许可证不冲突。如：MIT，Apache license v2.0，BSD
+
+
+## 第二部分：依赖信息
+#           指定该组件依赖的组件及版本，版本支持条件比较，支持：>=v1.0, >v1.0, ==v1.0, <=v1.0, <v1.0, v1.0
+#           未指定条件时，默认为 ==，如 v1.0 与 ==v1.0
+depends:                                   # <可选项> 该组件依赖其他的组件，合理的依赖才能保证组件能编译、使用
+  - AL_API: master
+  - log: master
+  - shell: master
+  
+
+
+## 第四部分：编译连接信息
+build_config:                              # <可选项> 编译配置项
+  internal_include:
+    - source/include                       # <可选项> 编译时，影响编译器的-I 参数 ,组件内有效
+  include:                                 # <可选项> 编译时，影响编译器的-I 参数 ,全局有效
+    - include                              
+  internal_cflag:                          # <可选项> C 编译器所需要要的编译参数，组件内部 
+    - -Dxxx
+    - -Dxx1
+  define:
+    - CONFIG_XXX ? <CONFIG_XXX>
+  
+source_file:                               # <可选项> 指定参与编译的源代码文件，支持通配符，采用相对路径
+  normal:
+    - source/*.c
+
+  #sram:       # sram区文件
+  #eram: ''
+
+## 第五部分：导出目标
+export:
+  dest: ''                                 # 目的地
+  target:                                  # 被导出的目标， 可以是多个，可以被宏控制
+    - ''
+
+## 第六部分：配置信息
+def_config:                                # 组件的可配置项
+    CONFIG_DEBUG: y

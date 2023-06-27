@@ -4,51 +4,9 @@
 #include "se_executor.h"
 #include "se_trigger.h"
 #include "se_defines.h"
+#include <stdint.h>
 
-// 设备信息结构体
-typedef struct {
-    // 设备信息字段
-    // devID
-    // typeid
-    // devAbility
-    // 场景模板ID
-    // 场景模板版本
-    // 场景规则ID
-    // 动作ID 或 触发条件ID
-} DeviceInfo;
 
-// 删除结果结构体
-typedef struct {
-    // 删除结果字段
-    // ...
-} DeletionResult;
-
-// 同步数据列表结构体
-typedef struct {
-    // 同步数据列表字段
-    // ...
-} SyncDataList;
-
-typedef struct {
-    // 调度器结构体定义
-    // ...
-} Scheduler;
-
-typedef struct {
-    //触发器同步数据
-} TriggerInfo;
-
-typedef struct {
-    //执行器同步数据
-    //optype
-    //role
-    //
-} ExecutorInfo;
-
-typedef struct 
-{
-    /* data */
-}templateInfo;
 
 /**
  * @brief       从电脑版预置文件中加载场景模板文件
@@ -145,7 +103,7 @@ void templateChangeNotification(Scheduler* scheduler, int templateId);
 */
 
 // 启用场景
-void enableScene(Scheduler* scheduler, int templateId);
+SE_ERR enableScene(Scheduler* scheduler, int templateId);
 /* 
     功能描述：启用场景
     输入：
@@ -154,7 +112,7 @@ void enableScene(Scheduler* scheduler, int templateId);
 */
 
 // 停用场景
-void disableScene(Scheduler* scheduler, int templateId);
+SE_ERR disableScene(Scheduler* scheduler, int templateId);
 /* 
     功能描述：停用场景
     输入：
@@ -162,14 +120,14 @@ void disableScene(Scheduler* scheduler, int templateId);
         - templateId：场景模板ID
 */
 
-// 场景执行判定
-SceneRule determineSceneExecution(const TriggerStatus* triggerStatus);
-/* 
-    功能描述：场景执行判定
-    输入：
-        - triggerStatus：触发条件满足状态
-    输出：要执行的场景规则
-*/
+/**
+ * @brief 场景执行判定
+ * @param triggerStatus 
+ * @param[out] RuleId
+ * @return int 规则id
+ */
+SE_ERR determineSceneExecution(const TriggerStatus* triggerStatus, int* RuleId);
+
 
 // 场景日志记录
 void logSceneExecutionResult(const SceneExecutionResult* executionResult);

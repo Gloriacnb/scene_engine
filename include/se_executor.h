@@ -1,14 +1,8 @@
 #ifndef SE_EXECUTOR_H
 #define SE_EXECUTOR_H
 
-#include "se_scheduler.h"
+#include "se_defines.h"
 
-typedef struct {
-    
-    // 执行器结构体定义
-    // 执行设备信息
-    // 对应场景信息
-} Executor;
 
 /**
  * @brief 
@@ -24,7 +18,7 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config);
  * @param config 
  * @return int 
  */
-int deleteExecutorData(Executor* executor, const ExecutorConfig* config);
+int deleteExecutorData(Executor* executor);
 
 
 // 场景执行
@@ -37,7 +31,7 @@ void sceneExecution(Executor* executor, int sceneId);
 */
 
 // 设备控制
-DeviceControlResult deviceControl(Executor* executor, int deviceId, const ControlCommand* command);
+ControlResult deviceControl(Executor* executor, int deviceId, const ControlCommand* command);
 /* 
     功能描述：设备控制
     输入：

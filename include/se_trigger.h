@@ -1,24 +1,8 @@
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
-#include "se_scheduler.h"
+#include "se_defines.h"
 
-typedef struct {
-    // 触发器结构体定义
-    // 触发设备ID
-} Trigger;
-
-// 触发器配置信息结构体
-typedef struct {
-    // 触发器配置信息字段
-    // ...
-} TriggerConfig;
-
-// 触发器状态枚举
-typedef enum {
-    TRIGGER_STATUS_SUCCESS,  // 成功
-    TRIGGER_STATUS_FAILURE   // 失败
-} TriggerStatus;
 
 /**
  * @brief 
@@ -38,8 +22,13 @@ int deleteTriggerData(Trigger* trigger, const TriggerConfig* config);
     输出：删除结果，0表示成功，-1表示失败
 */
 
-// 设备触发条件判定
-TriggerStatus evaluateDeviceTriggerConditions(const Trigger* trigger, const EppProperties* properties);
+/**
+ * @brief 设备触发条件判定
+ * @param trigger 
+ * @param properties 
+ * @return TriggerStatus 
+ */
+TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties);
 /* 
     功能描述：设备触发条件判定
     输入：

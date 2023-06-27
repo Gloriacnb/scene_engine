@@ -1,9 +1,21 @@
 #include "se_scheduler.h"
 #include "scheduler_inner.h"
 #include <assert.h>
+#include <stdlib.h>
+
+typedef struct  {
+    // 调度器结构体定义
+    // ...
+    int SceneId;
+}__scheduler;
 
 static SE_ERR parseSceneBaseInfo(templateInfo* temp, SceneBaseInfo* info);
 
+
+Scheduler* makeNullSchedulerHandle(void) {
+    __scheduler* sh = calloc(sizeof(__scheduler), 1);
+    return (Scheduler*)sh;
+}
 /**
  * @brief       从电脑版预置文件中加载场景模板文件
  * @param[out]  scheduler 调度器实例

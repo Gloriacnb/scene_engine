@@ -17,11 +17,7 @@
 #pragma once
 #include <stdint.h>
 
-typedef struct  {
-    // 调度器结构体定义
-    // ...
-    int SceneId;
-} __scheduler;
+
 
 typedef struct {
     uint16_t id;

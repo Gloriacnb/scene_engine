@@ -16,9 +16,9 @@
 
 #pragma once 
 
-typedef struct {
+struct __executor{
     
     // 执行器结构体定义
     // 执行设备信息
     // 对应场景信息
-} __executor;
+} ;

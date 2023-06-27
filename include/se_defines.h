@@ -19,6 +19,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     SUCCESS = 0,
     FAILED = -1,
@@ -131,7 +135,9 @@ typedef enum {
 
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 

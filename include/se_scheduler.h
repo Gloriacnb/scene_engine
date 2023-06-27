@@ -6,8 +6,11 @@
 #include "se_defines.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-
+Scheduler* makeNullSchedulerHandle(void);
 /**
  * @brief       从电脑版预置文件中加载场景模板文件
  * @param[out]  scheduler 调度器实例
@@ -136,5 +139,9 @@ void logSceneExecutionResult(const SceneExecutionResult* executionResult);
     输入：
         - executionResult：场景执行结果
 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SE_SCHEDULER_H */

@@ -12,7 +12,7 @@ add_subdirectory(/usr/src/googletest
 include_directories(/usr/src/googletest/include)
 
 # 添加测试源文件
-add_executable(unit_tests test_main.cpp)
+add_executable(unit_tests test_main.cpp test_port.cpp)
 
 # 链接 Google Test 库
 target_link_libraries(unit_tests 

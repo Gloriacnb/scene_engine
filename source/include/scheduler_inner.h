@@ -15,12 +15,24 @@
  */
 
 #pragma once
-#include <stdint.h>
+
+#include "se_defines.h"
 
 
+typedef struct  {
+    // 调度器结构体定义
+    DeviceId LocalDev;
+    uint8_t LocalAbility;
+    uint16_t SceneId;
+    uint16_t SceneVer;
+}__scheduler;
 
-typedef struct {
-    uint16_t id;
-    uint16_t version;
+static SE_ERR parseSceneBaseInfo(TemplateInfo* temp, SceneInfo* info);
 
-} SceneBaseInfo;
+static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo);
+
+static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo);
+
+static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo);
+
+static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo);

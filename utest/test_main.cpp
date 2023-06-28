@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "se_scheduler.h"
+#include "test_data.h"
 
 // 测试环境运行情况的测试用例
 TEST(EnvironmentTest, TestEnvironment)
@@ -26,14 +27,25 @@ TEST(EnvironmentTest, TestEnvironment)
 
 }
 
+
 TEST(ScenePairDevice, TestPairExecutor)
 {
     Scheduler* sh = makeNullSchedulerHandle();
-    templateInfo info;
+    TemplateInfo info;
     auto rtn = loadSceneTemplateFile(sh, &info);
-    EXPECT_EQ(rtn, SUCCESS);
-    DeviceInfo DevInfo;
-    // DevInfo.
-    // ExecutorInfo ExeInfo;
-    // pairExecutorDevice(sh, &DevInfo, &ExeInfo);
+    EXPECT_EQ(rtn, SE_SUCCESS);
+    DeviceInfo dev_info;
+    strcpy(dev_info.PairDev.id, EXEC_DEV_ID);
+    dev_info.devAbility = 0;
+    dev_info.presetting_type = 1;
+    dev_info.block.Tinfo.Id = 121;
+    dev_info.block.Tinfo.Version = 1;
+    dev_info.block.Tinfo.RuleNum = 2;
+    dev_info.block.Tinfo.Rules = NULL;
+    ExecutorInfo ExeInfo;
+    EXPECT_EQ(pairExecutorDevice(sh, &dev_info, &ExeInfo), SE_SUCCESS);
+    EXPECT_EQ(ExeInfo.role, 1);
+    EXPECT_STREQ(ExeInfo.Executor.id, LOCAL_DEV_ID);
+    EXPECT_STREQ(ExeInfo.ExecutorDev.id, EXEC_DEV_ID);
+
 }

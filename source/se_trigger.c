@@ -4,5 +4,5 @@
 
 int configureTrigger(Trigger* trigger, const TriggerConfig* config) {
     
-    return FAILED;
+    return SE_FAILED;
 }

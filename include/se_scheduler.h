@@ -16,7 +16,7 @@ Scheduler* makeNullSchedulerHandle(void);
  * @param[out]  scheduler 调度器实例
  * @param       templateFile 模板文件路径
  */
-SE_ERR loadSceneTemplateFile(Scheduler* scheduler, templateInfo* templateFile);
+SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile);
 
 
 /**

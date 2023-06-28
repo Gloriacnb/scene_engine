@@ -4,5 +4,5 @@
 
 
 SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config) {
-    return FAILED;
+    return SE_FAILED;
 }

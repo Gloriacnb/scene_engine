@@ -111,7 +111,42 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo) {
     } 
     return SE_FAILED;
 }
+
+static RuleInfo* getTemplateRule(SceneInfo* tmplate, uint8_t ruleID) {
+
+}
+
 static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
     //@todo 需要确认 scheduler内的场景模板数据后 再做数据提取
+    if( scheduler == NULL || sinfo == NULL ) {
+        return SE_FAILED;
+    }
+    __scheduler* sch = (__scheduler*)scheduler;
+    for (size_t i = 0; i < sinfo->RuleNum; i++)
+    {
+        RuleInfo* fillinfo = &sinfo->Rules[i];
+        RuleInfo* sourceinfo = getTemplateRule(&sch->TemplateData, fillinfo->RuleId);
+        if( sourceinfo ) {
+            for (size_t j = 0; j < fillinfo->ConditionNum; j++)
+            {
+                ConditionInfo* fillCond = &fillinfo->Conditions[j];
+                ConditionInfo* srcCond = getRuleCondition(sourceinfo, fillCond->CondId);
+                if( srcCond ) {
+                    *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                }
+            }
+            for (size_t k = 0; k < fillinfo->ActionNum; k++)
+            {
+                ActionInfo* fillCond = &fillinfo->Actions[k];
+                ActionInfo* srcCond = getRuleAction(sourceinfo, fillCond->CondId);
+                if( srcCond ) {
+                    *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                }
+            }
+            
+        }
+    }
+    
+
     return SE_FAILED;
 }

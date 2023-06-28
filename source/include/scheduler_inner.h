@@ -25,6 +25,7 @@ typedef struct  {
     uint8_t LocalAbility;
     uint16_t SceneId;
     uint16_t SceneVer;
+    SceneInfo TemplateData;
 }__scheduler;
 
 static SE_ERR parseSceneBaseInfo(TemplateInfo* temp, SceneInfo* info);

@@ -35,14 +35,29 @@ typedef enum {
 typedef struct __scheduler Scheduler;
 typedef char TLV;
 typedef struct {
-    uint8_t ObjId;
-    TLV* ObjData;
-}ObjData;
+    uint8_t CondId;
+    uint8_t OptType;
+    uint8_t CondType;
+    uint8_t FrameType;
+    uint16_t StatusCmd;
+    uint8_t CaeType;
+    uint8_t StartWord;
+    uint8_t StartBit;
+    uint8_t Length;
+    uint8_t Operation;
+    char* value;
+}ConditionInfo;
 
 typedef struct {
+    uint8_t ActId;
+    char* ActCmd;
+}ActionInfo;
+typedef struct {
     uint8_t RuleId;
-    uint8_t ObjNum;
-    ObjData* Objs;
+    uint8_t ConditionNum;
+    ConditionInfo* Conditions;
+    uint8_t ActionNum;
+    ActionInfo* Actions;
 }RuleInfo;
 
 typedef struct {
@@ -66,22 +81,14 @@ typedef union
 typedef struct {
     char id[32];
 }DeviceId;
-// 设备信息结构体
+
+// 配对设备信息结构体
 typedef struct {
     // 设备信息字段
-    // devID
     DeviceId PairDev;
-    // typeid
-    // devAbility
-    uint8_t devAbility;  //bit0 Trigger; bit1 Scheduler; bit2 Executor
-    uint8_t presetting_type; // 0 data block,  1 struct info
-
-    PresettingBlock block;
-    // 场景信息有两种提供方式，一种是预置数据块需要解析；一种是已经解析好的数据，包含如下字段
-    // 场景模板ID
-    // 场景模板版本
-    // 场景规则ID
-    // 动作ID 或 触发条件ID
+    uint8_t devAbility;         //bit0 Trigger; bit1 Scheduler; bit2 Executor
+    uint8_t presetting_type;    // 0 data block,  1 struct info
+    PresettingBlock block;      // 场景信息有两种提供方式，一种是预置数据块需要解析；一种是已经解析好的数据
 } DeviceInfo;
 
 typedef struct 

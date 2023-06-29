@@ -13,7 +13,7 @@ SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config) {
 }
 
 TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties) {
-    TriggerStatus st;
+    TriggerStatus st = {0};
     return st;
 }
 

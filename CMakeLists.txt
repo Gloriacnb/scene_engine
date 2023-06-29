@@ -17,3 +17,7 @@ target_include_directories(scene_engine
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/source/include
 
 )
+
+target_compile_options(scene_engine 
+    PUBLIC -Wall
+)

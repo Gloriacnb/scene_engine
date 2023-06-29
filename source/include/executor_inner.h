@@ -17,7 +17,7 @@
 #pragma once 
 
 #include "se_defines.h"
-typedef struct {
+typedef struct _executor{
     
     // 执行器结构体定义
     // 执行设备信息

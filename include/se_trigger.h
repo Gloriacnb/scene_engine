@@ -1,7 +1,9 @@
-#ifndef TRIGGER_H
-#define TRIGGER_H
+#ifndef SE_TRIGGER_H
+#define SE_TRIGGER_H
+
 
 #include "se_defines.h"
+#pragma once
 
 Trigger* makeNullTriggerHandle(void);
 

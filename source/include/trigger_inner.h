@@ -16,7 +16,7 @@
 
 #pragma once
 
-typedef struct {
+typedef struct _trigger {
     // 触发器结构体定义
     // 触发设备ID
 } __trigger;

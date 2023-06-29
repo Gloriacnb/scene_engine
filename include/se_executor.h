@@ -4,13 +4,16 @@
 #include "se_defines.h"
 
 Executor* makeNullExecutorHandle(void);
+
 /**
  * @brief 
- * @param[out] executor 
+ * 
+ * @param executor 
  * @param config 
+ * @param[out] result 
  * @return SE_ERR 
  */
-SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config);
+SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configResult* result);
 
 /**
  * @brief 

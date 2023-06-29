@@ -41,7 +41,13 @@ TEST(ScenePairDevice, TestPairExecutor)
     dev_info.block.Tinfo.Id = 121;
     dev_info.block.Tinfo.Version = 1;
     dev_info.block.Tinfo.RuleNum = 2;
-    dev_info.block.Tinfo.Rules = NULL;
+    dev_info.block.Tinfo.Rules = new RuleInfo[2];
+    RuleInfo* rules = dev_info.block.Tinfo.Rules;
+    for (size_t i = 0; i < 2; i++)
+    {
+
+    }
+    
     ExecutorInfo ExeInfo;
     EXPECT_EQ(pairExecutorDevice(sh, &dev_info, &ExeInfo), SE_SUCCESS);
     EXPECT_EQ(ExeInfo.role, 1);

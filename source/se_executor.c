@@ -7,7 +7,7 @@ Executor* makeNullExecutorHandle(void) {
     return (Executor*)exec;       
 }
 
-SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config) {
+SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configResult* result) {
     if( executor == NULL || config == NULL ) {
         return SE_FAILED;
     }
@@ -16,6 +16,10 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config) {
     exec->Executor = config->Executor;
     exec->ExecutorDev = config->ExecutorDev;
     exec->SceneData = config->TemplateInfo; //@todo 这里只做了浅拷贝，如果使用有问题再修改
+
+    result->ConfiguredDev = exec->Executor;
+    result->NotifiedDev = exec->Scheduler;
+    result->Result = SE_SUCCESS;
     return SE_SUCCESS;
 }
 

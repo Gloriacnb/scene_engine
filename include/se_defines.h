@@ -26,13 +26,14 @@ extern "C" {
 typedef enum {
     SE_SUCCESS = 0,
     SE_FAILED = -1,
-    
+    SE_HAVE_BEEN_PARIED = -2,
+    SE_ALLOCATE_MEMORY = -3,
     
 }SE_ERR;
 
 /******************* 调度器数据结构定义 *********************/
 
-typedef struct __scheduler Scheduler;
+typedef struct _scheduler Scheduler;
 //条件数据定义
 typedef struct {
     uint8_t CondId;
@@ -98,9 +99,10 @@ typedef struct {
 typedef struct {
 
 }DetermineResult;
-typedef struct 
-{
-    /* data */
+typedef struct {
+    DeviceId NotifiedDev;
+    DeviceId ConfiguredDev;
+    SE_ERR Result;  
 } configResult;
 
 // 删除结果结构体
@@ -114,10 +116,6 @@ typedef struct {
     // 同步数据列表字段
     // ...
 } SyncDataList;
-
-// typedef struct {
-//     //触发器同步数据
-// } TriggerInfo;
 
 typedef struct 
 {
@@ -139,9 +137,9 @@ typedef struct
 }SceneExecutionResult;
 
 
-/* 执行器数据结构定义 */
+/************************ 执行器数据结构定义 ****************************/
 
-typedef struct __executor Executor;
+typedef struct _executor Executor;
 
 
 typedef struct
@@ -163,12 +161,12 @@ typedef struct {
     SceneInfo TemplateInfo;    
 } ExecutorInfo;
 
-typedef struct ExecutorInfo TriggerInfo;
-/* 触发器数据结构定义 */
+
+/************************** 触发器数据结构定义 ****************************/
 
 typedef struct __trigger Trigger;
 
-
+typedef ExecutorInfo TriggerInfo;
 typedef struct 
 {
     /* data */

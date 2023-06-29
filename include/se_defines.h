@@ -30,10 +30,10 @@ typedef enum {
     
 }SE_ERR;
 
-/* 调度器数据结构定义 */
+/******************* 调度器数据结构定义 *********************/
 
 typedef struct __scheduler Scheduler;
-typedef char TLV;
+//条件数据定义
 typedef struct {
     uint8_t CondId;
     uint8_t OptType;
@@ -47,11 +47,12 @@ typedef struct {
     uint8_t Operation;
     char* value;
 }ConditionInfo;
-
+//动作数据定义
 typedef struct {
     uint8_t ActId;
     char* ActCmd;
 }ActionInfo;
+//规则信息定义
 typedef struct {
     uint8_t RuleId;
     uint8_t ConditionNum;
@@ -59,7 +60,7 @@ typedef struct {
     uint8_t ActionNum;
     ActionInfo* Actions;
 }RuleInfo;
-
+//场景数据定义
 typedef struct {
     uint16_t Id;
     uint16_t Version;
@@ -67,10 +68,12 @@ typedef struct {
     RuleInfo* Rules;
 }SceneInfo;
 
+//预置场景数据块
 typedef struct {
     uint16_t len;
     uint8_t* data;
 }PresettingSceneData;
+//预置场景块定义
 typedef union
 {
     SceneInfo Tinfo;
@@ -78,11 +81,12 @@ typedef union
 
 }PresettingBlock;
 
+//设备ID MAC TempID
 typedef struct {
     char id[32];
 }DeviceId;
 
-// 配对设备信息结构体
+// 待配对设备信息
 typedef struct {
     // 设备信息字段
     DeviceId PairDev;
@@ -91,6 +95,9 @@ typedef struct {
     PresettingBlock block;      // 场景信息有两种提供方式，一种是预置数据块需要解析；一种是已经解析好的数据
 } DeviceInfo;
 
+typedef struct {
+
+}DetermineResult;
 typedef struct 
 {
     /* data */

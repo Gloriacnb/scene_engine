@@ -3,6 +3,7 @@
 
 #include "se_defines.h"
 
+Trigger* makeNullTriggerHandle(void);
 
 /**
  * @brief 
@@ -10,10 +11,10 @@
  * @param config 
  * @return int 
  */
-int configureTrigger(Trigger* trigger, const TriggerConfig* config);
+SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config);
 
 // 删除触发器数据
-int deleteTriggerData(Trigger* trigger, const TriggerConfig* config);
+SE_ERR deleteTriggerData(Trigger* trigger, const TriggerConfig* config);
 /* 
     功能描述：删除触发器数据
     输入：

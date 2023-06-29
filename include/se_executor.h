@@ -3,7 +3,7 @@
 
 #include "se_defines.h"
 
-
+Executor* makeNullExecutorHandle(void);
 /**
  * @brief 
  * @param[out] executor 
@@ -18,11 +18,17 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config);
  * @param config 
  * @return int 
  */
-int deleteExecutorData(Executor* executor);
+// int deleteExecutorData(Executor* executor);
 
 
-// 场景执行
-ControlCommand sceneExecution(Executor* executor, int sceneId);
+/**
+ * @brief 
+ * 
+ * @param executor 
+ * @param[out] cmd 
+ * @return SE_ERR 
+ */
+SE_ERR sceneExecution(Executor* executor, ControlCommand* cmd);
 /* 
     功能描述：场景执行
     输入：
@@ -31,7 +37,7 @@ ControlCommand sceneExecution(Executor* executor, int sceneId);
 */
 
 // 控制结果上报
-void controlResultReport(Executor* executor, const ControlResult* result);
+SE_ERR controlResultReport(Executor* executor, const ControlResult* result);
 /* 
     功能描述：控制结果上报
     输入：

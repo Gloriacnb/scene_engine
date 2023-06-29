@@ -34,14 +34,14 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, Ex
  * @param configResult 
  * @return SE_ERR 
  */
-void executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult);
+SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult);
 
 /**
  * @brief 执行器数据删除结果通知
  * @param scheduler 
  * @param deletionResult 
  */
-void executorDataDeletionResultNotification(Scheduler* scheduler, const DeletionResult* deletionResult);
+// void executorDataDeletionResultNotification(Scheduler* scheduler, const DeletionResult* deletionResult);
 
 /**
  * @brief 配对触发器设备
@@ -65,7 +65,7 @@ void triggerConfigResultNotification(Scheduler* scheduler, const configResult* c
  * @param scheduler 
  * @param deletionResult 
  */
-void triggerDataDeletionResultNotification(Scheduler* scheduler, const DeletionResult* deletionResult);
+// void triggerDataDeletionResultNotification(Scheduler* scheduler, const DeletionResult* deletionResult);
 
 
 // 查询配对设备列表
@@ -124,16 +124,18 @@ SE_ERR disableScene(Scheduler* scheduler, int templateId);
 */
 
 /**
- * @brief 场景执行判定
+ * @brief 判定场景是否符合执行条件
+ * 
+ * @param scheduler 
  * @param triggerStatus 
- * @param[out] RuleId @todo 需要增加执行sn
- * @return int 规则id 
+ * @param[out] DetRst 
+ * @return SE_ERR 
  */
-SE_ERR determineSceneExecution(const TriggerStatus* triggerStatus, int* RuleId);
+SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* triggerStatus, DetermineResult* DetRst);
 
 
 // 场景日志记录
-void logSceneExecutionResult(const SceneExecutionResult* executionResult);
+void logSceneExecutionResult(Scheduler* scheduler, const SceneExecutionResult* executionResult);
 /* 
     功能描述：记录场景执行日志
     输入：

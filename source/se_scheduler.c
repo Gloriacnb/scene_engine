@@ -70,6 +70,13 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
     return SE_SUCCESS;
 }
 
+SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
+    return SE_FAILED;
+}
+
+SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* triggerStatus, DetermineResult* DetRst) {
+    return SE_FAILED;
+}
 
 
 /* inner functions */

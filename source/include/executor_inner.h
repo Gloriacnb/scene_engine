@@ -16,9 +16,14 @@
 
 #pragma once 
 
-struct __executor{
+#include "se_defines.h"
+typedef struct {
     
     // 执行器结构体定义
     // 执行设备信息
+    DeviceId Executor;
+    DeviceId ExecutorDev;
+    DeviceId Scheduler;
     // 对应场景信息
-} ;
+    SceneInfo SceneData;
+}__executor;

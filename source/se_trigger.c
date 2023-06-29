@@ -17,6 +17,6 @@ TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevPropert
     return st;
 }
 
-SE_ERR deleteTriggerData(Trigger* trigger, const TriggerConfig* config) {
+SE_ERR deleteTriggerData(Trigger* trigger, const TriggerInfo* config) {
     return SE_FAILED;
 }

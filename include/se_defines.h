@@ -115,14 +115,15 @@ typedef struct {
     // ...
 } SyncDataList;
 
-typedef struct {
-    //触发器同步数据
-} TriggerInfo;
+// typedef struct {
+//     //触发器同步数据
+// } TriggerInfo;
 
 typedef struct 
 {
     /* data */
 }TemplateInfo;
+
 
 
 typedef struct 
@@ -162,17 +163,11 @@ typedef struct {
     SceneInfo TemplateInfo;    
 } ExecutorInfo;
 
-
+typedef struct ExecutorInfo TriggerInfo;
 /* 触发器数据结构定义 */
 
 typedef struct __trigger Trigger;
 
-
-// 触发器配置信息结构体
-typedef struct {
-    // 触发器配置信息字段
-    // ...
-} TriggerConfig;
 
 typedef struct 
 {

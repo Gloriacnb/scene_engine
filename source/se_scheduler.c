@@ -70,6 +70,9 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
     return SE_SUCCESS;
 }
 
+SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
+    return pairExecutorDevice(scheduler, deviceInfo, triggerInfo);
+}
 SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
     return SE_FAILED;
 }

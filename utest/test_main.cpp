@@ -49,3 +49,8 @@ TEST(ScenePairDevice, TestPairExecutor)
     EXPECT_STREQ(ExeInfo.ExecutorDev.id, EXEC_DEV_ID);
 
 }
+
+TEST(ScenePairDevice, TestPairTrigger)
+{
+    
+}

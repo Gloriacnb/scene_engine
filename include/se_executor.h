@@ -22,23 +22,12 @@ int deleteExecutorData(Executor* executor);
 
 
 // 场景执行
-void sceneExecution(Executor* executor, int sceneId);
+ControlCommand sceneExecution(Executor* executor, int sceneId);
 /* 
     功能描述：场景执行
     输入：
         - executor：执行器实例
         - sceneId：场景ID
-*/
-
-// 设备控制
-ControlResult deviceControl(Executor* executor, int deviceId, const ControlCommand* command);
-/* 
-    功能描述：设备控制
-    输入：
-        - executor：执行器实例
-        - deviceId：设备ID
-        - command：控制命令
-    输出：设备控制结果
 */
 
 // 控制结果上报

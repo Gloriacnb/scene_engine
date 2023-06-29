@@ -37,4 +37,7 @@ TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevPropert
     输出：触发器状态，成功或失败
 */
 
+//增加获取trigger对应scheduler device id
+
+
 #endif /* TRIGGER_H */

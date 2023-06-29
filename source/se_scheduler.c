@@ -44,7 +44,6 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
 
     //需要输出的执行器配置数据
     SceneInfo* pSceneConfig = &executorInfo->TemplateInfo;
-    assert(pSceneConfig);
 
     //首先使用执行设备预置数据初始化 配置数据
     SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, pSceneConfig);
@@ -113,11 +112,37 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo) {
 }
 
 static RuleInfo* getTemplateRule(SceneInfo* tmplate, uint8_t ruleID) {
+    assert(tmplate);
+    for (size_t i = 0; i < tmplate->RuleNum; i++)
+    {
+        if( tmplate->Rules[i].RuleId == ruleID ) {
+            return &tmplate->Rules[i];
+        }
+    }
+    return (RuleInfo*)NULL;
+}
 
+static ConditionInfo* getRuleCondition(RuleInfo* Rule, uint8_t CondId) {
+    for (size_t i = 0; i < Rule->ConditionNum; i++)
+    {
+        if(Rule->Conditions[i].CondId == CondId ) {
+            return &Rule->Conditions[i];
+        }
+    }
+    return NULL;
+}
+static ActionInfo* getRuleAction(RuleInfo* Rule, uint8_t ActId) {
+    for (size_t i = 0; i < Rule->ActionNum; i++)
+    {
+        if(Rule->Actions[i].ActId == ActId ) {
+            return &Rule->Actions[i];
+        }
+    }
+    return NULL;
 }
 
 static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
-    //@todo 需要确认 scheduler内的场景模板数据后 再做数据提取
+
     if( scheduler == NULL || sinfo == NULL ) {
         return SE_FAILED;
     }
@@ -134,13 +159,19 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                 if( srcCond ) {
                     *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
                 }
+                else {
+                    //@todo 模板数据中无匹配的 条件ID，需要错误处理
+                }
             }
             for (size_t k = 0; k < fillinfo->ActionNum; k++)
             {
-                ActionInfo* fillCond = &fillinfo->Actions[k];
-                ActionInfo* srcCond = getRuleAction(sourceinfo, fillCond->CondId);
-                if( srcCond ) {
-                    *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                ActionInfo* fillAction = &fillinfo->Actions[k];
+                ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
+                if( srcAction ) {
+                    *fillAction = *srcAction; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                }
+                else {
+                    //@todo 模板数据中无匹配的 动作ID，需要错误处理
                 }
             }
             
@@ -148,5 +179,5 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
     }
     
 
-    return SE_FAILED;
+    return SE_SUCCESS;
 }

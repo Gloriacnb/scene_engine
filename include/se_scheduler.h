@@ -126,8 +126,8 @@ SE_ERR disableScene(Scheduler* scheduler, int templateId);
 /**
  * @brief 场景执行判定
  * @param triggerStatus 
- * @param[out] RuleId
- * @return int 规则id
+ * @param[out] RuleId @todo 需要增加执行sn
+ * @return int 规则id 
  */
 SE_ERR determineSceneExecution(const TriggerStatus* triggerStatus, int* RuleId);
 

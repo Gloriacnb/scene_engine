@@ -1,4 +1,6 @@
 
-static const char LOCAL_DEV_ID[] = "111111111";
+static const char LOCAL_DEV_ID[] = "device1";
 
-static const char EXEC_DEV_ID[] = "2222222222";
+static const char EXEC_DEV_ID[] = "device1";
+
+static const char TRIG_DEV_ID[] = "device2";

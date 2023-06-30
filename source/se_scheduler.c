@@ -257,6 +257,7 @@ static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId) {
     return false;  // 没有找到匹配的节点
 }
 
+/*
 static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId) {
     PairStatus* current = *head;
     PairStatus* prev = NULL;
@@ -355,3 +356,4 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
 
     free(sceneInfo->Rules);
 }
+*/

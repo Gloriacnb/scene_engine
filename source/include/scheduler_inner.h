@@ -53,8 +53,8 @@ static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid);
 static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, State state);
 static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const DeviceId* deviceId);
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
-static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
+// static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
 
-static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
+// static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 
-static void freeSceneInfo(SceneInfo* sceneInfo);
+// static void freeSceneInfo(SceneInfo* sceneInfo);

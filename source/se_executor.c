@@ -23,6 +23,6 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configR
     return SE_SUCCESS;
 }
 
-SE_ERR sceneExecution(Executor* executor, ControlCommand* cmd) {
+SE_ERR sceneExecution(Executor* executor, ExecutionResult* cmd) {
     return SE_FAILED;
 }

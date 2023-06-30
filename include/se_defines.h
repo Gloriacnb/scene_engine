@@ -147,10 +147,17 @@ typedef struct
     /* data */
 }ControlResult;
 
+typedef struct {
+    uint16_t Length;
+    char* Cmd;
+}CtrlCommand;
 typedef struct 
 {
     /* data */
-}ControlCommand;
+    DeviceId ExecutorDev;
+    DeviceId Scheduler;
+    CtrlCommand* cmd;
+}ExecutionResult;
 typedef struct {
     //执行器同步数据
     uint8_t optype; //0 新增; 1 修改

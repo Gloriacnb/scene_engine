@@ -18,5 +18,9 @@
 
 typedef struct _trigger {
     // 触发器结构体定义
-    // 触发设备ID
+    DeviceId Trigger;
+    DeviceId TriggerDev;
+    DeviceId Scheduler;
+    // 对应场景信息
+    SceneInfo SceneData;
 } __trigger;

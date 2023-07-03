@@ -13,7 +13,7 @@ Trigger* makeNullTriggerHandle(void);
  * @param config 
  * @return int 
  */
-SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config);
+SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResult* result);
 
 // 删除触发器数据
 SE_ERR deleteTriggerData(Trigger* trigger, const TriggerInfo* config);

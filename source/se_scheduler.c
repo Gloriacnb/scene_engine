@@ -88,6 +88,9 @@ SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult
     return SE_FAILED;
 }
 
+SE_ERR triggerConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
+    return executorConfigResultNotification(scheduler, configResult);
+}
 SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* triggerStatus, DetermineResult* DetRst) {
     return SE_FAILED;
 }

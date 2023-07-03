@@ -159,7 +159,7 @@ typedef struct
     CtrlCommand* cmd;
 }ExecutionResult;
 typedef struct {
-    //执行器同步数据
+    //配对同步数据
     uint8_t optype; //0 新增; 1 修改
     uint8_t role; //0 Trigger; 1 Executor
     DeviceId Executor;

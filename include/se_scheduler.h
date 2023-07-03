@@ -58,7 +58,7 @@ SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, Tri
  * @param configResult 
  * @return SE_ERR 
  */
-void triggerConfigResultNotification(Scheduler* scheduler, const configResult* configResult);
+SE_ERR triggerConfigResultNotification(Scheduler* scheduler, const configResult* configResult);
 
 /**
  * @brief 触发器数据删除结果通知

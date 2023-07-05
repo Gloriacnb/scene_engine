@@ -20,12 +20,12 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     __scheduler* sch = (__scheduler*)scheduler;
     assert(sch);
     assert(templateFile);
-    SceneInfo BaseInfo;
-    if( parseSceneBaseInfo(templateFile, &BaseInfo) == SE_SUCCESS ) {
-        sch->SceneId = BaseInfo.Id;
-        sch->SceneVer = BaseInfo.Id;
+    if( parseTLV(templateFile->data, templateFile->length, &sch->TemplateData) == SE_SUCCESS ) {
+        sch->SceneId = sch->TemplateData.Id;
+        sch->SceneVer = sch->TemplateData.Id;
         sch->LocalAbility = 7;
         getLocakDeviceId(&sch->LocalDev);
+        sch->PairDevList = NULL;
     }
 
     return SE_SUCCESS;
@@ -97,7 +97,7 @@ SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* trigge
     if( scheduler == NULL || triggerStatus == NULL || DetRst == NULL ) {
         return SE_FAILED;
     }
-    __scheduler* sch = (__scheduler*)scheduler;
+    // __scheduler* sch = (__scheduler*)scheduler;
 
     return SE_FAILED;
 }
@@ -105,18 +105,6 @@ SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* trigge
 
 /* inner functions */
 
-static SE_ERR parseSceneBaseInfo(TemplateInfo* temp, SceneInfo* info) {
-    //调用 scene组件 load 方法获取模板内容
-    info->Id = 121; //@todo 临时测试
-    info->Version = 1;
-    info->RuleNum = 2;
-    info->Rules = malloc(sizeof(RuleInfo) * info->RuleNum);
-    info->Rules[0].ActionNum = 1;
-    info->Rules[0].ConditionNum = 2;
-    info->Rules[0].RuleId = 10;
-    info->Rules[0].Actions = malloc(sizeof(ActionInfo) * info->Rules[0].ActionNum);
-    return SE_SUCCESS;
-}
 
 static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo) {
     //@todo 后期会实现选择逻辑，当前默认与调度器在一起
@@ -197,6 +185,8 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
     for (size_t i = 0; i < sinfo->RuleNum; i++)
     {
         RuleInfo* fillinfo = &sinfo->Rules[i];
+
+        /* 这里根据讨论结果，触发器配对时无规则信息，需要匹配所有规则 */
         RuleInfo* sourceinfo = getTemplateRule(&sch->TemplateData, fillinfo->RuleId);
         if( sourceinfo ) {
             for (size_t j = 0; j < fillinfo->ConditionNum; j++)
@@ -210,10 +200,11 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                     //@todo 模板数据中无匹配的 条件ID，需要错误处理
                 }
             }
-            for (size_t k = 0; k < fillinfo->ActionNum; k++)
-            {
 //TODO_230705, ActionGroup
 /*
+            for (size_t k = 0; k < fillinfo->ActionNum; k++)
+            {
+
                 ActionInfo* fillAction = &fillinfo->Actions[k];
                 ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
                 if( srcAction ) {
@@ -222,8 +213,8 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                 else {
                     //@todo 模板数据中无匹配的 动作ID，需要错误处理
                 }
-*/
             }
+*/
             
         }
     }
@@ -407,24 +398,24 @@ static const utlv_tag_info_t gSceneInfo_tag_info = {
     gSceneInfo_sub_tags
 };
 
-static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo)
+static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo)
 {
     utlv_ctx_t *ctx;
     utlv_data_t indata = {0};
 
     if(!data || !sceneInfo) {
         //input null
-        return;
+        return SE_FAILED;
     }
-    if(sceneInfo->) {
+    if(sceneInfo->tlv_ctx) {
         //not clear
-        return;
+        return SE_FAILED;
     }
 
     ctx = utlv_get_ctx(UTLV_S_TYPE_V1);
     if(!ctx) {
         //FAIL
-        return;
+        return SE_FAILED;
     }
 
     indata.buf = data;
@@ -433,7 +424,7 @@ static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo)
     utlv_decode(ctx, &gSceneInfo_tag_info, &indata, sceneInfo);
     sceneInfo->tlv_ctx = ctx;
 
-    return;
+    return SE_SUCCESS;
 }
 
 static void freeSceneInfo(SceneInfo* sceneInfo) {

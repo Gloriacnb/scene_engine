@@ -21,3 +21,9 @@ target_include_directories(scene_engine
 target_compile_options(scene_engine 
     PUBLIC -Wall
 )
+
+target_compile_definitions(scene_engine 
+    PUBLIC NOT_BUILD_IN_UHOS
+
+
+)

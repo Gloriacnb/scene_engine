@@ -39,8 +39,6 @@ typedef struct _scheduler {
     PairStatus* PairDevList;
 }__scheduler;
 
-static SE_ERR parseSceneBaseInfo(TemplateInfo* temp, SceneInfo* info);
-
 static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo);
 
 static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo);
@@ -55,6 +53,6 @@ static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const Device
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
 
-// static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
+static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 
 // static void freeSceneInfo(SceneInfo* sceneInfo);

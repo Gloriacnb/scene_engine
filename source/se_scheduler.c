@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "uhos_ctlv.h"
+
 Scheduler* makeNullSchedulerHandle(void) {
     __scheduler* sch = calloc(sizeof(__scheduler), 1);
     return (Scheduler*)sch;
@@ -161,11 +163,22 @@ static ConditionInfo* getRuleCondition(RuleInfo* Rule, uint8_t CondId) {
     return NULL;
 }
 static ActionInfo* getRuleAction(RuleInfo* Rule, uint8_t ActId) {
-    for (size_t i = 0; i < Rule->ActionNum; i++)
+//TODO_230705, ActionGroup
+    //for (size_t i = 0; i < Rule->ActionNum; i++)
+    for (size_t i = 0; i < Rule->ActionGNum; i++)
     {
-        if(Rule->Actions[i].ActId == ActId ) {
-            return &Rule->Actions[i];
-        }
+		if(Rule->ActionGs) {
+			for(size_t j=0; j<(Rule->ActionGs+i)->ActsNum; j++){
+				if((Rule->ActionGs+i)->actions
+					&& ActId == ((Rule->ActionGs+i)->actions+j)->ActId) {
+					return ((Rule->ActionGs+i)->actions+j);
+				}
+			}
+		}
+
+//        if(Rule->Actions[i].ActId == ActId ) {
+  //          return &Rule->Actions[i];
+    //    }
     }
     return NULL;
 }
@@ -194,6 +207,8 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
             }
             for (size_t k = 0; k < fillinfo->ActionNum; k++)
             {
+//TODO_230705, ActionGroup
+/*
                 ActionInfo* fillAction = &fillinfo->Actions[k];
                 ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
                 if( srcAction ) {
@@ -202,6 +217,7 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                 else {
                     //@todo 模板数据中无匹配的 动作ID，需要错误处理
                 }
+*/
             }
             
         }
@@ -286,7 +302,145 @@ static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId*
 
     return *head;  // 没有找到匹配的节点，返回原链表头指针
 }
+*/
 
+static const utlv_tag_info_t gSceneConditionInfo_tags[] = {
+ {0x2201, sizeof(uhos_u8), offsetof(ConditionInfo,CondId), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2202, sizeof(uhos_u8), offsetof(ConditionInfo,OptType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2211, sizeof(uhos_u8), offsetof(ConditionInfo,CondType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2212, sizeof(uhos_u8), offsetof(ConditionInfo,FrameType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2213, sizeof(uhos_u16), offsetof(ConditionInfo,StatusCmd), utlv_ctype_uint16, 0,0,0,0,0,UHOS_NULL},
+ {0x2214, sizeof(uhos_u8), offsetof(ConditionInfo,CaeType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2215, sizeof(uhos_u8), offsetof(ConditionInfo,StartWord), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2216, sizeof(uhos_u8), offsetof(ConditionInfo,StartBit), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2217, sizeof(uhos_u8), offsetof(ConditionInfo,Length), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2204, sizeof(uhos_u8), offsetof(ConditionInfo,Operation), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+ {0x2205, sizeof(uhos_u8), offsetof(ConditionInfo,value), utlv_ctype_arr_uint8, 1,
+    utlv_ctype_uint16,offsetof(ConditionInfo,nBytesValue),0,0,UHOS_NULL},
+};
+
+static const utlv_tag_info_t gSceneConditionInfoObj_tags[] = {
+  {0x2200, sizeof(ConditionInfo), 0, utlv_ctype_object, 0,0,0,0,
+    sizeof(gSceneConditionInfo_tags)/sizeof(utlv_tag_info_t), gSceneConditionInfo_tags}
+};
+
+static const utlv_tag_info_t gSceneActionInfo_tags[] = {
+  {0x2331, sizeof(uhos_u8), offsetof(ActionInfo,ActId), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL},
+  {0x2333, sizeof(uhos_u8), offsetof(ActionInfo,execute_type), utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
+  {0x2332, sizeof(uhos_u8), offsetof(ActionInfo,ActCmd), utlv_ctype_arr_uint8, 1,
+        utlv_ctype_uint16,offsetof(ActionInfo,nBtesActCmd),0,0,UHOS_NULL}
+};
+
+static const utlv_tag_info_t gSceneActionInfoObj_tags[] = {
+  {0x233E, sizeof(ActionInfo), 0, utlv_ctype_object, 0, 0,0,0,
+    sizeof(gSceneActionInfo_tags)/sizeof(utlv_tag_info_t), gSceneActionInfo_tags}
+};
+
+static const utlv_tag_info_t gSceneActGrps_tags[] = {
+  {0x233f, sizeof(uhos_u8), offsetof(ActionGroup, ActsNum), utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
+  {0x2330, sizeof(ActionInfo), offsetof(ActionGroup,actions), utlv_ctype_array_flag,1,0,0,0x233f,
+    1, gSceneActionInfoObj_tags}
+};
+
+static const utlv_tag_info_t gSceneActGrpsObj_tags[] = {
+  {0x2300, sizeof(ActionInfo), 0, utlv_ctype_object, 0, 0,0,0,
+    sizeof(gSceneActGrps_tags)/sizeof(utlv_tag_info_t), gSceneActGrps_tags}
+};
+
+static const utlv_tag_info_t gSceneRule_tags[] = {
+  //rid
+  {0x2001, sizeof(uhos_u8), offsetof(RuleInfo,RuleId), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  {0x200E, sizeof(uhos_u16),offsetof(RuleInfo,salience), utlv_ctype_uint16,0,0,0,0,0,UHOS_NULL},
+  {0x200F, sizeof(uhos_u8), offsetof(RuleInfo,status), utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
+  {0x2008, sizeof(uhos_u8), offsetof(RuleInfo,exprType),utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
+  {0x2005, sizeof(uhos_u8), offsetof(RuleInfo,expression),utlv_ctype_string,1,0,0,0,0,UHOS_NULL},
+  {0x2006, sizeof(uhos_u8),offsetof(RuleInfo,ConditionNum), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  {0x2003, sizeof(ConditionInfo),offsetof(RuleInfo,Conditions),utlv_ctype_array_flag, 1,0,0,0x2006,
+    1, gSceneConditionInfoObj_tags},
+  {0x2007, sizeof(uhos_u8),offsetof(RuleInfo,ActionGNum), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  {0x2004, sizeof(ActionInfo),offsetof(RuleInfo,ActionGs), utlv_ctype_array_flag, 1,0,0, 0x2007,
+    1, gSceneActGrpsObj_tags}
+};
+
+static const utlv_tag_info_t gSceneRuleObj_tags[] =
+{
+  {0x2000, sizeof(RuleInfo), 0, utlv_ctype_object, 0, 0,0,0,
+    sizeof(gSceneRule_tags)/sizeof(utlv_tag_info_t),
+    gSceneRule_tags}
+};
+
+static const utlv_tag_info_t gSceneInfo_sub_tags[] =
+{
+  //T item_size         offset,                ctype
+  //Id
+  {1, sizeof(uhos_u16), offsetof(SceneInfo,Id), utlv_ctype_uint16, 0,0,0,0,0,UHOS_NULL },
+  //Ver
+  {2, sizeof(uhos_u16), offsetof(SceneInfo,Version), utlv_ctype_uint16, 0,0,0,0,0,UHOS_NULL },
+  //Type
+  {3, sizeof(uhos_u8), offsetof(SceneInfo,type), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  //sceneType
+  {4, sizeof(uhos_u8), offsetof(SceneInfo,sceneType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  //triggerType
+  {5, sizeof(uhos_u8), offsetof(SceneInfo,triggerType), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  //status
+  {6, sizeof(uhos_u8), offsetof(SceneInfo,status), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  //createTime
+  {7, sizeof(uhos_u64), offsetof(SceneInfo,createTime), utlv_ctype_uint64,0,0,0,0,0,UHOS_NULL },
+  //updateTime
+  {8, sizeof(uhos_u64), offsetof(SceneInfo,updateTime), utlv_ctype_uint64,0,0,0,0,0,UHOS_NULL },
+  //protocol_ver
+  {0xC, sizeof(uhos_u8), offsetof(SceneInfo,protocol_ver), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  //RuleNum
+  {0xB, sizeof(uhos_u8), offsetof(SceneInfo,RuleNum), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
+  {0xA, sizeof(RuleInfo), offsetof(SceneInfo,Rules), utlv_ctype_array_flag,1,0,0,0xB,
+    1, gSceneRuleObj_tags}
+};
+
+static const utlv_tag_info_t gSceneInfo_tag_info = {
+  0,sizeof(SceneInfo),0,utlv_ctype_object,0,0,0,0,
+    sizeof(gSceneInfo_sub_tags)/sizeof(utlv_tag_info_t),
+    gSceneInfo_sub_tags
+};
+
+static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo)
+{
+    utlv_ctx_t *ctx;
+    utlv_data_t indata = {0};
+
+    if(!data || !sceneInfo) {
+        //input null
+        return;
+    }
+    if(sceneInfo->) {
+        //not clear
+        return;
+    }
+
+    ctx = utlv_get_ctx(UTLV_S_TYPE_V1);
+    if(!ctx) {
+        //FAIL
+        return;
+    }
+
+    indata.buf = data;
+    indata.buf_l = length;
+
+    utlv_decode(ctx, &gSceneInfo_tag_info, &indata, sceneInfo);
+    sceneInfo->tlv_ctx = ctx;
+
+    return;
+}
+
+static void freeSceneInfo(SceneInfo* sceneInfo) {
+    if(!sceneInfo || !(sceneInfo->tlv_ctx)) {
+        return;
+    }
+
+    utlv_free(sceneInfo->tlv_ctx, &gSceneInfo_tag_info, sceneInfo, 0);
+    utlv_put_ctx(sceneInfo->tlv_ctx);
+}
+
+/*
 static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo) {
     uint16_t index = 0;
 
@@ -365,3 +519,4 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
     free(sceneInfo->Rules);
 }
 */
+

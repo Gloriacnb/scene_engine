@@ -9,12 +9,17 @@ extern "C" {
 // utlv_config.h
 #ifndef NOT_BUILD_IN_UHOS
 #include "uh_types.h"
+#include "uh_libc_mem.h"
 
-#define UTLV_LOGD(x)
-#define UTLV_LOGI(x)
-#define UTLV_LOGW(x)
-#define UTLV_LOGE(x)
-#define UTLV_HEX_DUMP(x)
+#define UTLV_LOGD(x, ...)
+#define UTLV_LOGI(x, ...)
+#define UTLV_LOGW(x, ...)
+#define UTLV_LOGE(x, ...)
+#define UTLV_HEX_DUMP(x, ...)
+
+#ifndef offsetof
+#define offsetof(t,m) ((uhos_size_t) &(((t)*)0)->m)
+#endif
 
 #else //NOT_BUILD_IN_UHOS means NOT_IN_UHOS
 #include <stddef.h>

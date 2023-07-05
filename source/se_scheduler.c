@@ -434,6 +434,7 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
 
     utlv_free(sceneInfo->tlv_ctx, &gSceneInfo_tag_info, sceneInfo, 0);
     utlv_put_ctx(sceneInfo->tlv_ctx);
+	sceneInfo->tlv_ctx = UHOS_NULL;
 }
 
 /*

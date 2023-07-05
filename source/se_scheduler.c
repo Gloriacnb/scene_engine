@@ -108,6 +108,11 @@ static SE_ERR parseSceneBaseInfo(TemplateInfo* temp, SceneInfo* info) {
     info->Id = 121; //@todo 临时测试
     info->Version = 1;
     info->RuleNum = 2;
+    info->Rules = malloc(sizeof(RuleInfo) * info->RuleNum);
+    info->Rules[0].ActionNum = 1;
+    info->Rules[0].ConditionNum = 2;
+    info->Rules[0].RuleId = 10;
+    info->Rules[0].Actions = malloc(sizeof(ActionInfo) * info->Rules[0].ActionNum);
     return SE_SUCCESS;
 }
 

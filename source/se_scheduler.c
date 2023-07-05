@@ -9,6 +9,8 @@
 
 Scheduler* makeNullSchedulerHandle(void) {
     __scheduler* sch = calloc(sizeof(__scheduler), 1);
+    assert(sch);
+    sch->state = IDLE;
     return (Scheduler*)sch;
 }
 /**
@@ -84,7 +86,7 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
     executorInfo->ObjDev = pairDeviceInfo->PairDev;
     executorInfo->Scheduler = sch->LocalDev;
 
-    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, PAIRING);
+    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, PAIRED);
     return SE_SUCCESS;
 }
 
@@ -98,7 +100,7 @@ SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult
     __scheduler* sch = (__scheduler*)scheduler;
     PairStatus* st = findPairStatusByDeviceId(sch->PairDevList, &configResult->ConfiguredDev);
     if(st && (st->state == PAIRING) ) {
-        st->state = ALREADYPAIRED;
+        st->state = SYNCED;
     }
     return SE_FAILED;
 }
@@ -175,22 +177,20 @@ static ConditionInfo* getRuleCondition(RuleInfo* Rule, uint8_t CondId) {
     return NULL;
 }
 static ActionInfo* getRuleAction(RuleInfo* Rule, uint8_t ActId) {
-//TODO_230705, ActionGroup
-    //for (size_t i = 0; i < Rule->ActionNum; i++)
+
     for (size_t i = 0; i < Rule->ActionGNum; i++)
     {
 		if(Rule->ActionGs) {
-			for(size_t j=0; j<(Rule->ActionGs+i)->ActsNum; j++){
-				if((Rule->ActionGs+i)->actions
-					&& ActId == ((Rule->ActionGs+i)->actions+j)->ActId) {
-					return ((Rule->ActionGs+i)->actions+j);
-				}
-			}
+            for (size_t j = 0; j < Rule->ActionGs[i].ActsNum; j++)
+            {
+                if(Rule->ActionGs[i].actions[j].ActId == ActId ) {
+                    return &Rule->ActionGs[i].actions[j];
+                }
+            }
+            
 		}
 
-//        if(Rule->Actions[i].ActId == ActId ) {
-  //          return &Rule->Actions[i];
-    //    }
+
     }
     return NULL;
 }
@@ -206,35 +206,43 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
         RuleInfo* fillinfo = &sinfo->Rules[i];
 
         /* 这里根据讨论结果，触发器配对时无规则信息，需要匹配所有规则 */
-        RuleInfo* sourceinfo = getTemplateRule(&sch->TemplateData, fillinfo->RuleId);
-        if( sourceinfo ) {
-            for (size_t j = 0; j < fillinfo->ConditionNum; j++)
-            {
-                ConditionInfo* fillCond = &fillinfo->Conditions[j];
-                ConditionInfo* srcCond = getRuleCondition(sourceinfo, fillCond->CondId);
-                if( srcCond ) {
-                    *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
-                }
-                else {
-                    //@todo 模板数据中无匹配的 条件ID，需要错误处理
-                }
-            }
-//TODO_230705, ActionGroup
-/*
-            for (size_t k = 0; k < fillinfo->ActionNum; k++)
-            {
+        // RuleInfo* sourceinfo = getTemplateRule(&sch->TemplateData, fillinfo->RuleId);
+        for (size_t n = 0; n < sch->TemplateData.RuleNum; n++)
+        {
+            RuleInfo* sourceinfo = &sch->TemplateData.Rules[n];
 
-                ActionInfo* fillAction = &fillinfo->Actions[k];
-                ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
-                if( srcAction ) {
-                    *fillAction = *srcAction; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+            if( sourceinfo ) {
+                for (size_t j = 0; j < fillinfo->ConditionNum; j++)
+                {
+                    ConditionInfo* fillCond = &fillinfo->Conditions[j];
+                    ConditionInfo* srcCond = getRuleCondition(sourceinfo, fillCond->CondId);
+                    if( srcCond ) {
+                        *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                    }
+                    else {
+                        //@todo 模板数据中无匹配的 条件ID，需要错误处理
+                    }
                 }
-                else {
-                    //@todo 模板数据中无匹配的 动作ID，需要错误处理
+
+                for (size_t m = 0; m < fillinfo->ActionGNum; m++)
+                {
+        
+                    ActionGroup* ActGroup = &fillinfo->ActionGs[m];
+                    for (size_t k = 0; k < ActGroup->ActsNum; k++)
+                    {
+
+                        ActionInfo* fillAction = &ActGroup->actions[k];
+                        ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
+                        if( srcAction ) {
+                            *fillAction = *srcAction; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                        }
+                        else {
+                            //@todo 模板数据中无匹配的 动作ID，需要错误处理
+                        }
+                    }
                 }
+                
             }
-*/
-            
         }
     }
     

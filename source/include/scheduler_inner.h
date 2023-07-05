@@ -21,16 +21,23 @@
 
 typedef enum {
     UNPAIRED,
-    PAIRING,
-    ALREADYPAIRED,
-}State;
+    PAIRED,
+    SYNCED,
+}PairState;
 typedef struct _PairStatus {
     DeviceId PairDev;
-    State state;
+    PairState state;
     struct _PairStatus* next;
 } PairStatus;
+
+typedef enum {
+    IDLE,
+    READY,
+    WORKING,
+}WorkState;
 typedef struct _scheduler {
     // 调度器结构体定义
+    WorkState state;
     DeviceId LocalDev;
     uint8_t LocalAbility;
     uint16_t SceneId;

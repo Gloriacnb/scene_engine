@@ -46,27 +46,50 @@ typedef struct {
     uint8_t StartBit;
     uint8_t Length;
     uint8_t Operation;
-    char* value;
+    uint16_t nBytesValue; //value中字节数
+    char* value;  //不是字符串，是字节数组
 }ConditionInfo;
 //动作数据定义
 typedef struct {
     uint8_t ActId;
-    char* ActCmd;
+    uint8_t execute_type;
+    uint16_t nBtesActCmd; //ActCmd中字节数
+    char* ActCmd; //不是字符串，是字节数组
 }ActionInfo;
+
+typedef struct {
+    uint8_t ActsNum;
+    ActionInfo *actions;
+}ActionGroup;
 //规则信息定义
 typedef struct {
     uint8_t RuleId;
+    uint16_t salience;
+    uint8_t status;
+    uint8_t exprType;
+    char *expression;
     uint8_t ConditionNum;
     ConditionInfo* Conditions;
-    uint8_t ActionNum;
-    ActionInfo* Actions;
+//    uint8_t ActionNum;
+//    ActionInfo* Actions;
+    uint8_t ActionGNum;
+    ActionGroup *ActionGs;
 }RuleInfo;
 //场景数据定义
 typedef struct {
     uint16_t Id;
     uint16_t Version;
+    uint8_t type;
+    uint8_t sceneType;
+    uint8_t triggerType;
+    uint8_t status;
+    uint64_t createTime;
+    uint64_t updateTime;
+    uint8_t protocol_ver;
     uint8_t RuleNum;
     RuleInfo* Rules;
+
+    void *tlv_ctx;  //for tlv
 }SceneInfo;
 
 //预置场景数据块

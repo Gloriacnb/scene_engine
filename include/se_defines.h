@@ -170,10 +170,10 @@ typedef struct {
     SceneInfo TemplateInfo;    
 } SceneObject;
 
-typedef SceneObject ExeutorInfo;
+typedef SceneObject ExecutorInfo;
 /************************** 触发器数据结构定义 ****************************/
 
-typedef struct __trigger Trigger;
+typedef struct _trigger Trigger;
 
 typedef SceneObject TriggerInfo;
 typedef struct 

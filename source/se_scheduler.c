@@ -65,8 +65,8 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
     // 其它executor配置信息
     executorInfo->optype = 0;
     executorInfo->role = 1;
-    executorInfo->Executor = chooseWhereToCreate(scheduler, pairDeviceInfo);
-    executorInfo->ExecutorDev = pairDeviceInfo->PairDev;
+    executorInfo->Obj = chooseWhereToCreate(scheduler, pairDeviceInfo);
+    executorInfo->ObjDev = pairDeviceInfo->PairDev;
     executorInfo->Scheduler = sch->LocalDev;
 
     addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, PAIRING);

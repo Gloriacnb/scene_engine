@@ -13,8 +13,8 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configR
     }
     __executor* exec = (__executor*)executor;
     exec->Scheduler = config->Scheduler;
-    exec->Executor = config->Executor;
-    exec->ExecutorDev = config->ExecutorDev;
+    exec->Executor = config->Obj;
+    exec->ExecutorDev = config->ObjDev;
     exec->SceneData = config->TemplateInfo; //@todo 这里只做了浅拷贝，如果使用有问题再修改
 
     result->ConfiguredDev = exec->Executor;

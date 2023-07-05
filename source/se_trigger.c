@@ -13,8 +13,8 @@ SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResul
     }
     __trigger* trig = (__trigger*)trigger;
     trig->Scheduler = config->Scheduler;
-    trig->Trigger = config->Executor;
-    trig->TriggerDev = config->ExecutorDev;
+    trig->Trigger = config->Obj;
+    trig->TriggerDev = config->ObjDev;
     trig->SceneData = config->TemplateInfo; //@todo 这里只做了浅拷贝，如果使用有问题再修改
 
     result->ConfiguredDev = trig->Trigger;

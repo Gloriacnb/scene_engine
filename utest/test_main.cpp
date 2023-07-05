@@ -45,7 +45,8 @@ TEST(ScenePairDevice, TestPairExecutor)
     RuleInfo* rules = dev_info.block.Tinfo.Rules;
     for (size_t i = 0; i < 2; i++)
     {
-
+        rules[i].RuleId = i;
+        
     }
     
     ExecutorInfo ExeInfo;

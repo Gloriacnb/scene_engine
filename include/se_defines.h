@@ -158,22 +158,24 @@ typedef struct
     DeviceId Scheduler;
     CtrlCommand* cmd;
 }ExecutionResult;
+
+
 typedef struct {
     //配对同步数据
     uint8_t optype; //0 新增; 1 修改
     uint8_t role; //0 Trigger; 1 Executor
-    DeviceId Executor;
-    DeviceId ExecutorDev;
+    DeviceId Obj;
+    DeviceId ObjDev;
     DeviceId Scheduler;
     SceneInfo TemplateInfo;    
-} ExecutorInfo;
+} SceneObject;
 
-
+typedef SceneObject ExeutorInfo;
 /************************** 触发器数据结构定义 ****************************/
 
 typedef struct __trigger Trigger;
 
-typedef ExecutorInfo TriggerInfo;
+typedef SceneObject TriggerInfo;
 typedef struct 
 {
     /* data */
@@ -181,11 +183,14 @@ typedef struct
 
 // 触发器状态枚举
 typedef enum {
-    TRIGGER_STATUS_SUCCESS,  // 成功
-    TRIGGER_STATUS_FAILURE   // 失败
-} TriggerStatus;
+    TRIGGER_STATE_SUCCESS,  // 成功
+    TRIGGER_STATE_FAILURE   // 失败
+} TriggerState;
 
-
+typedef struct {
+    DeviceId TriggerDev;
+    TriggerState state;
+}TriggerStatus;
 
 
 #ifdef __cplusplus

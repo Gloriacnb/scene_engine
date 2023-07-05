@@ -8,7 +8,7 @@
 Trigger* makeNullTriggerHandle(void);
 
 /**
- * @brief 
+ * @brief 配置触发器
  * @param trigger 
  * @param config 
  * @return int 
@@ -26,12 +26,14 @@ SE_ERR deleteTriggerData(Trigger* trigger, const TriggerInfo* config);
 */
 
 /**
- * @brief 设备触发条件判定
+ * @brief 触发条件判定
+ * 
  * @param trigger 
  * @param properties 
- * @return TriggerStatus 
+ * @param status 
+ * @return SE_ERR 
  */
-TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties);
+SE_ERR evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties, TriggerStatus* status);
 /* 
     功能描述：设备触发条件判定
     输入：

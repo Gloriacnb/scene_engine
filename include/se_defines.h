@@ -183,8 +183,8 @@ typedef struct
 
 // 触发器状态枚举
 typedef enum {
-    TRIGGER_STATE_SUCCESS,  // 成功
-    TRIGGER_STATE_FAILURE   // 失败
+    TRIGGER_STATE_TRIGGERED,  // 触发
+    TRIGGER_STATE_UNTRIGGERED   // 未触发
 } TriggerState;
 
 typedef struct {

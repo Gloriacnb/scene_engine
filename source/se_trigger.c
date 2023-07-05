@@ -23,9 +23,9 @@ SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResul
     return SE_SUCCESS;
 }
 
-TriggerStatus evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties) {
-    TriggerStatus st = {0};
-    return st;
+SE_ERR evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties, TriggerStatus* status) {
+
+    return SE_FAILED;
 }
 
 SE_ERR deleteTriggerData(Trigger* trigger, const TriggerInfo* config) {

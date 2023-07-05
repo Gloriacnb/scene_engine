@@ -18,7 +18,7 @@ extern "C" {
 #define UTLV_HEX_DUMP(x, ...)
 
 #ifndef offsetof
-#define offsetof(t,m) ((uhos_size_t) &(((t)*)0)->m)
+#define offsetof(t,m) ((uhos_size_t) &((t*)0)->m)
 #endif
 
 #else //NOT_BUILD_IN_UHOS means NOT_IN_UHOS

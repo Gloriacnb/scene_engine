@@ -55,7 +55,7 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo);
 static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo);
 
 static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid);
-static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, State state);
+static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, PairState state);
 static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const DeviceId* deviceId);
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);

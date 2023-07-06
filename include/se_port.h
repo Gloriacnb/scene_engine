@@ -23,9 +23,9 @@ extern "C" {
  * @param[out] did 
  * @return SE_ERR 
  */
-SE_ERR getLocakDeviceId(DeviceId* did);
+SE_ERR getLocalDeviceId(DeviceId* did);
 
-
+extern uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8_t* data, uint8_t data_len);
 
 #ifdef __cplusplus
 }

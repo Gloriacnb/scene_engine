@@ -108,6 +108,8 @@ typedef union
 //设备ID MAC TempID
 typedef struct {
     char id[32];
+    char TempId[16];
+    char BleMac[6];
 }DeviceId;
 
 // 待配对设备信息
@@ -120,7 +122,7 @@ typedef struct {
 } DeviceInfo;
 
 typedef struct {
-
+    DeviceId Executor;
 }DetermineResult;
 typedef struct {
     DeviceId NotifiedDev;
@@ -142,8 +144,10 @@ typedef struct {
 
 typedef struct 
 {
-    const uint8_t* data;
-    uint16_t length;
+    uint32_t TemplateId;
+    uint32_t TemplateType;
+    uint32_t TemplateSize;
+    uint8_t LocalAbility;
 }TemplateInfo;
 
 
@@ -203,6 +207,7 @@ typedef SceneObject TriggerInfo;
 typedef struct 
 {
     /* data */
+    //@todo
 }DevProperties;
 
 // 触发器状态枚举

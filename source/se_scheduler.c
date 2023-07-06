@@ -99,7 +99,7 @@ SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult
     }
     __scheduler* sch = (__scheduler*)scheduler;
     PairStatus* st = findPairStatusByDeviceId(sch->PairDevList, &configResult->ConfiguredDev);
-    if(st && (st->state == PAIRING) ) {
+    if(st && (st->state == PAIRED) ) {
         st->state = SYNCED;
     }
     return SE_FAILED;
@@ -255,7 +255,7 @@ static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid) {
     return isDeviceIdInList(sch->PairDevList, devid);
 }
 
-static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, State state) {
+static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, PairState state) {
     PairStatus* newPairStatus = (PairStatus*)malloc(sizeof(PairStatus));
     if (newPairStatus == NULL) {
         return SE_ALLOCATE_MEMORY;

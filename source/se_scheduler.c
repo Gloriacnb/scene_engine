@@ -20,11 +20,14 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     __scheduler* sch = (__scheduler*)scheduler;
     assert(sch);
     assert(templateFile);
-    if( parseTLV(templateFile->data, templateFile->length, &sch->TemplateData) == SE_SUCCESS ) {
+    uint8_t* TemplateData = calloc(templateFile->TemplateSize, 1);
+    int32_t LoadBytes = uhos_scene_data_load(templateFile->TemplateId, templateFile->TemplateType, 0, TemplateData, templateFile->TemplateSize);
+    assert(LoadBytes > 0);
+    if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) == SE_SUCCESS ) {
         sch->SceneId = sch->TemplateData.Id;
         sch->SceneVer = sch->TemplateData.Id;
         sch->LocalAbility = 7;
-        getLocakDeviceId(&sch->LocalDev);
+        getLocalDeviceId(&sch->LocalDev);
         sch->PairDevList = NULL;
     }
 
@@ -32,7 +35,17 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
 }
 
 
-
+SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_t sceneVer) {
+    if( scheduler == NULL ) {
+        return SE_FAILED;
+    }
+    __scheduler* sch = (__scheduler*)scheduler;
+    assert(sch);
+    if( (sch->SceneId == sceneId) && (sch->SceneVer == sceneVer) ) {
+        return SE_SUCCESS;
+    } 
+    return SE_FAILED;    
+}
 
 
 SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
@@ -120,6 +133,12 @@ static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneIn
         return SE_SUCCESS;
     }
     //@todo 如果是块数据，需要解析并转化为SceneInfo 再输出
+    else {
+        if( parseTLV(pairDeviceInfo->block.TData.data, pairDeviceInfo->block.TData.len, sinfo) == SE_SUCCESS ) {
+            return SE_SUCCESS;
+        }
+    }
+
     return SE_FAILED;
 }
 

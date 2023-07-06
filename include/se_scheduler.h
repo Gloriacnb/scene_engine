@@ -18,7 +18,15 @@ Scheduler* makeNullSchedulerHandle(void);
  */
 SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile);
 
-
+/**
+ * @brief 判断配对设备与预置模板是否匹配
+ * 
+ * @param scheduler 
+ * @param sceneId 
+ * @param sceneVer 
+ * @return SE_ERR  匹配：返回SE_SUCCESS, 不匹配： 其它值
+ */
+SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_t sceneVer);
 /**
  * @brief 发起设备配对
  * @param scheduler 

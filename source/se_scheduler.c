@@ -23,6 +23,7 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     assert(sch);
     assert(templateFile);
     uint8_t* TemplateData = calloc(templateFile->TemplateSize, 1);
+    assert(TemplateData);
     int32_t LoadBytes = uhos_scene_data_load(templateFile->TemplateId, templateFile->TemplateType, 0, TemplateData, templateFile->TemplateSize);
     assert(LoadBytes > 0);
     if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) != SE_SUCCESS ) {
@@ -30,10 +31,10 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     }
     sch->SceneId = sch->TemplateData.Id;
     sch->SceneVer = sch->TemplateData.Id;
-    sch->LocalAbility = 7;
-    getLocalDeviceId(&sch->LocalDev);
+    sch->LocalAbility = templateFile->LocalAbility;
+    strcpy(sch->LocalDev.id, templateFile->LocalDevId);
     sch->PairDevList = NULL;
-
+    sch->state = IDLE;
     return SE_SUCCESS;
 }
 
@@ -49,9 +50,6 @@ SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_
     } 
     return SE_FAILED;    
 }
-
-
-
 
 static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
     // 检查调度器和设备信息是否为空

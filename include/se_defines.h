@@ -145,8 +145,9 @@ typedef struct {
 typedef struct 
 {
     uint32_t TemplateId;
-    uint32_t TemplateType;
     uint32_t TemplateSize;
+    uint16_t TemplateType;
+    char LocalDevId[33];
     uint8_t LocalAbility;
 }TemplateInfo;
 
@@ -220,6 +221,13 @@ typedef struct {
     DeviceId TriggerDev;
     TriggerState state;
 }TriggerStatus;
+
+
+#ifdef DEBUG_PRINT
+#define DebugPrint(format, ...) printf(format, __VA_ARGS__)
+#else
+#define DebugPrint(format, ...)
+#endif
 
 
 #ifdef __cplusplus

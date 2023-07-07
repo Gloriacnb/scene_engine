@@ -25,6 +25,6 @@ target_compile_options(scene_engine
 
 target_compile_definitions(scene_engine 
     PUBLIC NOT_BUILD_IN_UHOS
-
+    PUBLIC DEBUG_PRINT
 
 )

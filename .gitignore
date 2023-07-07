@@ -2,6 +2,7 @@
 out
 log.yaml
 build
+cmake_build
 utest/build
 
 .vscode/launch.json

@@ -60,6 +60,7 @@ typedef struct {
 
 typedef struct {
     uint8_t ActsNum;
+    uint8_t *actionIds;
     ActionInfo *actions;
 }ActionGroup;
 //规则信息定义
@@ -71,6 +72,7 @@ typedef struct {
     char *expression;
     uint8_t ConditionNum;
     ConditionInfo* Conditions;
+    uint8_t *Cids;
 //    uint8_t ActionNum;
 //    ActionInfo* Actions;
     uint8_t ActionGNum;

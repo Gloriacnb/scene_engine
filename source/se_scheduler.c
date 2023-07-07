@@ -402,7 +402,8 @@ static const utlv_tag_info_t gSceneActionInfoObj_tags[] = {
 
 static const utlv_tag_info_t gSceneActGrps_tags[] = {
   {0x233f, sizeof(uhos_u8), offsetof(ActionGroup, ActsNum), utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
-  {0x2330, sizeof(ActionInfo), offsetof(ActionGroup,actions), utlv_ctype_array_flag,1,0,0,0x233f,
+  {0x2330, sizeof(uhos_u8), offsetof(ActionGroup,actionIds), utlv_ctype_arr_uint8,1,0,0,0x233f,0,UHOS_NULL},
+  {0x2340, sizeof(ActionInfo), offsetof(ActionGroup,actions), utlv_ctype_array_flag,1,0,0,0x233f,
     1, gSceneActionInfoObj_tags}
 };
 
@@ -419,10 +420,11 @@ static const utlv_tag_info_t gSceneRule_tags[] = {
   {0x2008, sizeof(uhos_u8), offsetof(RuleInfo,exprType),utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
   {0x2005, sizeof(uhos_u8), offsetof(RuleInfo,expression),utlv_ctype_string,1,0,0,0,0,UHOS_NULL},
   {0x2006, sizeof(uhos_u8),offsetof(RuleInfo,ConditionNum), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
-  {0x2003, sizeof(ConditionInfo),offsetof(RuleInfo,Conditions),utlv_ctype_array_flag, 1,0,0,0x2006,
+  {0x2003, sizeof(uhos_u8),offsetof(RuleInfo,Cids), utlv_ctype_arr_uint8, 1,0,0,0x2006, 0, UHOS_NULL},
+  {0x2010, sizeof(ConditionInfo),offsetof(RuleInfo,Conditions),utlv_ctype_array_flag, 1,0,0,0x2006,
     1, gSceneConditionInfoObj_tags},
   {0x2007, sizeof(uhos_u8),offsetof(RuleInfo,ActionGNum), utlv_ctype_uint8, 0,0,0,0,0,UHOS_NULL },
-  {0x2004, sizeof(ActionInfo),offsetof(RuleInfo,ActionGs), utlv_ctype_array_flag, 1,0,0, 0x2007,
+  {0x2004, sizeof(ActionGroup),offsetof(RuleInfo,ActionGs), utlv_ctype_array_flag, 1,0,0, 0x2007,
     1, gSceneActGrpsObj_tags}
 };
 

@@ -11,11 +11,13 @@
 
 #pragma once
 
-#include "se_defines.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+#include "se_defines.h"
+
 
 /**
  * @brief Get the Locak Device Id object
@@ -25,7 +27,7 @@ extern "C" {
  */
 SE_ERR getLocalDeviceId(DeviceId* did);
 
-extern uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8_t* data, uint8_t data_len);
+uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8_t* data, uint8_t data_len);
 
 #ifdef __cplusplus
 }

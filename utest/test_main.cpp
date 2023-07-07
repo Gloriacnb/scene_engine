@@ -52,8 +52,8 @@ TEST(ScenePairDevice, TestPairExecutor)
     ExecutorInfo ExeInfo;
     EXPECT_EQ(pairExecutorDevice(sh, &dev_info, &ExeInfo), SE_SUCCESS);
     EXPECT_EQ(ExeInfo.role, 1);
-    EXPECT_STREQ(ExeInfo.Executor.id, LOCAL_DEV_ID);
-    EXPECT_STREQ(ExeInfo.ExecutorDev.id, EXEC_DEV_ID);
+    EXPECT_STREQ(ExeInfo.Obj.id, LOCAL_DEV_ID);
+    EXPECT_STREQ(ExeInfo.ObjDev.id, EXEC_DEV_ID);
 
 }
 

@@ -6,6 +6,7 @@ add_library(scene_engine STATIC
     source/se_executor.c
     source/se_scheduler.c
     source/se_trigger.c
+    source/uhos_ctlv.c
     # ...
 )
 

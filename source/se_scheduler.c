@@ -25,13 +25,14 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     uint8_t* TemplateData = calloc(templateFile->TemplateSize, 1);
     int32_t LoadBytes = uhos_scene_data_load(templateFile->TemplateId, templateFile->TemplateType, 0, TemplateData, templateFile->TemplateSize);
     assert(LoadBytes > 0);
-    if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) == SE_SUCCESS ) {
-        sch->SceneId = sch->TemplateData.Id;
-        sch->SceneVer = sch->TemplateData.Id;
-        sch->LocalAbility = 7;
-        getLocalDeviceId(&sch->LocalDev);
-        sch->PairDevList = NULL;
+    if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) != SE_SUCCESS ) {
+        return SE_FAILED;
     }
+    sch->SceneId = sch->TemplateData.Id;
+    sch->SceneVer = sch->TemplateData.Id;
+    sch->LocalAbility = 7;
+    getLocalDeviceId(&sch->LocalDev);
+    sch->PairDevList = NULL;
 
     return SE_SUCCESS;
 }

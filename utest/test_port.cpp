@@ -13,13 +13,16 @@
 #include <string.h>
 #include "test_data.h"
 #include <fstream>
-#inlcude <iostream>
+#include <iostream>
 #include <vector>
 
-SE_ERR getLocakDeviceId(DeviceId* did) {
+extern "C" {
+
+SE_ERR getLocalDeviceId(DeviceId* did) {
     memcpy(did->id, LOCAL_DEV_ID, sizeof(LOCAL_DEV_ID));
     return SE_SUCCESS;
 }
+
 
 uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8_t* data, uint8_t data_len) {
     std::ifstream file("test_tlv_v1_01.bin", std::ios::binary);
@@ -48,4 +51,6 @@ uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8
     std::copy(buffer.begin(), buffer.end(), data);
 
     return fileSize;
+}
+
 }

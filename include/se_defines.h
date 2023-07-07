@@ -107,7 +107,7 @@ typedef union
 
 //设备ID MAC TempID
 typedef struct {
-    char id[32];
+    char id[33];
     char TempId[16];
     char BleMac[6];
 }DeviceId;
@@ -147,7 +147,7 @@ typedef struct
     uint32_t TemplateId;
     uint32_t TemplateSize;
     uint16_t TemplateType;
-    char LocalDevId[33];
+    DeviceId LocalDevId;
     uint8_t LocalAbility;
 }TemplateInfo;
 

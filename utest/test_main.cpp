@@ -33,7 +33,7 @@ TEST(ScenePairDevice, TestPairExecutor)
     Scheduler* sh = makeNullSchedulerHandle();
     TemplateInfo info;
     info.TemplateSize = 1024;
-    strcpy(info.LocalDevId, LOCAL_DEV_ID);
+    strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
     auto rtn = loadSceneTemplateFile(sh, &info);
     EXPECT_EQ(rtn, SE_SUCCESS);
     DeviceInfo dev_info;

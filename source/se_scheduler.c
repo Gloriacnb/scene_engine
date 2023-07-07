@@ -32,7 +32,7 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     sch->SceneId = sch->TemplateData.Id;
     sch->SceneVer = sch->TemplateData.Id;
     sch->LocalAbility = templateFile->LocalAbility;
-    strcpy(sch->LocalDev.id, templateFile->LocalDevId);
+    sch->LocalDev = templateFile->LocalDevId;
     sch->PairDevList = NULL;
     sch->state = IDLE;
     return SE_SUCCESS;

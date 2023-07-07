@@ -18,6 +18,7 @@
 #define SE_DEFINES_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -224,7 +225,7 @@ typedef struct {
 
 
 #ifdef DEBUG_PRINT
-#define DebugPrint(format, ...) printf(format, __VA_ARGS__)
+#define DebugPrint(format, ...) printf( format, ##__VA_ARGS__)
 #else
 #define DebugPrint(format, ...)
 #endif

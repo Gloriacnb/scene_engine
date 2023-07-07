@@ -59,23 +59,29 @@ static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo,
     __scheduler* sch = (__scheduler*)scheduler;
     // 配对执行
     if( HaveBeenPaired(scheduler, &pairDeviceInfo->PairDev) ) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return SE_HAVE_BEEN_PARIED;
     }
     //需要输出的执行器配置数据
     SceneInfo* pSceneConfig = &executorInfo->TemplateInfo;
-
+    pSceneConfig = calloc(sizeof(SceneInfo), 1);
+    assert(pSceneConfig);
     //首先使用执行设备预置数据初始化 配置数据
     SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, pSceneConfig);
     if(rst != SE_SUCCESS) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return rst;
     }
     //判断预置信息与模板信息是否匹配
     if( isSceneMatch(scheduler, pSceneConfig) != SE_SUCCESS ) {
+
+        DebugPrint("$$$$$$$ERR-%d\n", __LINE__);
         return SE_FAILED;
     }
     //读取模板内配置数据 填充执行器配置
     rst = fillWithTemplateData(scheduler, pSceneConfig);
     if(rst != SE_SUCCESS) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return rst;
     }
 
@@ -168,6 +174,9 @@ static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneIn
         if( parseTLV(pairDeviceInfo->block.TData.data, pairDeviceInfo->block.TData.len, sinfo) == SE_SUCCESS ) {
             return SE_SUCCESS;
         }
+        else {
+            DebugPrint("$$$$$$$ERR-parseTLV");
+        }
     }
 
     return SE_FAILED;
@@ -179,6 +188,8 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo) {
     }
     __scheduler* sch = (__scheduler*)scheduler;
     assert(sch);
+    DebugPrint("+++++++sinfo Id:%d Version:%d\n ", sinfo->Id, sinfo->Version);
+    DebugPrint("++++++++Scheduler Id:%d Version:%d\n ", sch->SceneId, sch->SceneVer);
     if( (sch->SceneId == sinfo->Id) && (sch->SceneVer == sinfo->Version) ) {
         return SE_SUCCESS;
     } 

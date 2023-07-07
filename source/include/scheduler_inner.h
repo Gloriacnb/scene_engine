@@ -16,6 +16,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "se_defines.h"
 #include <stdbool.h>
 
@@ -64,3 +68,8 @@ static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 
 // static void freeSceneInfo(SceneInfo* sceneInfo);
+
+
+#ifdef __cplusplus
+}
+#endif

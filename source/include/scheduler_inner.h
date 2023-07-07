@@ -26,6 +26,7 @@ typedef enum {
 }PairState;
 typedef struct _PairStatus {
     DeviceId PairDev;
+    uint8_t Role;
     PairState state;
     struct _PairStatus* next;
 } PairStatus;
@@ -55,7 +56,7 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo);
 static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo);
 
 static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid);
-static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, PairState state);
+static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, uint8_t Role, PairState state);
 static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const DeviceId* deviceId);
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);

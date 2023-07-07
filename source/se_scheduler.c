@@ -50,8 +50,9 @@ SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_
 }
 
 
-SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
-    
+
+
+static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
     // 检查调度器和设备信息是否为空
     if (scheduler == NULL || pairDeviceInfo == NULL || executorInfo == NULL) {
         return SE_FAILED;
@@ -81,18 +82,23 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
 
     // 其它executor配置信息
     executorInfo->optype = 0;
-    executorInfo->role = 1;
+    executorInfo->role = Role;
     executorInfo->Obj = chooseWhereToCreate(scheduler, pairDeviceInfo);
     executorInfo->ObjDev = pairDeviceInfo->PairDev;
     executorInfo->Scheduler = sch->LocalDev;
 
-    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, PAIRED);
+    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, Role, PAIRED);
     return SE_SUCCESS;
 }
 
-SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
-    return pairExecutorDevice(scheduler, deviceInfo, triggerInfo);
+SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
+    return PairDevice(scheduler, pairDeviceInfo, 1, executorInfo);
 }
+
+SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
+    return PairDevice(scheduler, deviceInfo, 0, triggerInfo);
+}
+
 SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
     if (scheduler == NULL || configResult == NULL) {
         return SE_FAILED;
@@ -117,7 +123,31 @@ SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* trigge
     return SE_FAILED;
 }
 
+DeviceInfoList getPairedDeviceList(const Scheduler* scheduler) {
 
+
+    DeviceInfoList deviceList;
+    memset(&deviceList, 0, sizeof(DeviceInfoList));
+    __scheduler* sch = (__scheduler*)scheduler;
+    if( sch == NULL ) {
+        return deviceList;
+    }
+    const PairStatus* current = sch->PairDevList;
+
+    while (current != NULL) {
+        if (current->state == SYNCED) {
+            if (current->Role == 0) {
+                deviceList.TriggerDevCnt++;
+            }
+            else {
+                deviceList.ExecutorDevCnt++;
+            }
+        }
+        current = current->next;
+    }
+
+    return deviceList;
+}
 /* inner functions */
 
 
@@ -255,13 +285,14 @@ static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid) {
     return isDeviceIdInList(sch->PairDevList, devid);
 }
 
-static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, PairState state) {
+static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, uint8_t Role, PairState state) {
     PairStatus* newPairStatus = (PairStatus*)malloc(sizeof(PairStatus));
     if (newPairStatus == NULL) {
         return SE_ALLOCATE_MEMORY;
     }
 
     newPairStatus->PairDev = *deviceId;
+    newPairStatus->Role = Role;
     newPairStatus->state = state;
     newPairStatus->next = NULL;
 

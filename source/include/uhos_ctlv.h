@@ -71,10 +71,20 @@ typedef UHOS_UWORD_TYPE    uhos_size_t;
 #include "stdio.h"
 #include "string.h"
 
+
+
+#ifdef NO_DEBUG_TLV
+#define UTLV_LOGD(...)
+#define UTLV_LOGI(...)
+#define UTLV_LOGW(...)
+#define UTLV_LOGE(...)
+#else
 #define UTLV_LOGD printf("\n%s(%d)[D]",__func__, __LINE__);printf
 #define UTLV_LOGI printf("\n%s(%d)[I]",__func__, __LINE__);printf
 #define UTLV_LOGW printf("\n%s(%d)[W]",__func__, __LINE__);printf
 #define UTLV_LOGE printf("\n%s(%d)[E]",__func__, __LINE__);printf
+#endif
+
 
 #define uhos_libc_free free
 #define uhos_libc_malloc malloc
@@ -90,6 +100,7 @@ typedef UHOS_UWORD_TYPE    uhos_size_t;
 #define uhos_libc_snprintf snprintf
 
 //MYDUMP("buf", buf, len);
+#ifndef NO_DEBUG_TLV
 #define MYDUMP(T,B,L) do {\
     int i; \
     for(i=0; i<(L) && (B); i++) { \
@@ -100,6 +111,10 @@ typedef UHOS_UWORD_TYPE    uhos_size_t;
 } while(0)
 
 #define UTLV_HEX_DUMP(t,b,l) ("\n%s(%d)[DUMP]",__func__, __LINE__);MYDUMP((t),(b),(l))
+#else
+#define MYDUMP(...)
+#define UTLV_HEX_DUMP(...)
+#endif //NO_DEBUG_TLV
 
 #endif //NOT_BUILD_IN_UHOS
 

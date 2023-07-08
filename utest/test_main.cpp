@@ -41,7 +41,7 @@ TEST(ScenePairDevice, TestPairExecutor)
     dev_info.devAbility = 0;
     dev_info.presetting_type = 1;
     dev_info.block.Tinfo.Id = 100;
-    dev_info.block.Tinfo.Version = 100;
+    dev_info.block.Tinfo.Version = 1;
     dev_info.block.Tinfo.RuleNum = 2;
     dev_info.block.Tinfo.Rules = new RuleInfo[2];
     RuleInfo* rules = dev_info.block.Tinfo.Rules;

@@ -31,7 +31,8 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configR
  * @param[out] cmd 
  * @return SE_ERR 
  */
-SE_ERR sceneExecution(Executor* executor, ExecutionResult* cmd);
+//SE_ERR sceneExecution(Executor* executor, ExecutionResult* cmd);
+SE_ERR sceneExecution(Executor* executor, const DetermineResult* DetRst, ExecCmds_t *cmds);
 /* 
     功能描述：场景执行
     输入：

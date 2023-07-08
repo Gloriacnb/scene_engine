@@ -108,6 +108,34 @@ typedef union
 
 }PresettingBlock;
 
+typedef struct {
+    uint16_t tid;
+    uint8_t  rid;
+    uint8_t  id;
+} Scene_ids_t;
+
+typedef enum {
+  DevProp_type_undefined,
+  DevProp_type_epp,
+
+  DevProp_type_last
+} DevProp_type_t;
+
+typedef struct
+{
+    uint32_t l;
+    uint8_t *buf;
+} byte_t;
+
+typedef struct
+{
+    uint32_t task_no;
+    DevProp_type_t type;
+    union {
+        byte_t epp;
+    } data;
+}DevProperties;
+
 //设备ID MAC TempID
 typedef struct {
     char id[33];
@@ -125,8 +153,13 @@ typedef struct {
 } DeviceInfo;
 
 typedef struct {
+    uint32_t task_no;
+    uint32_t schedule_no;
     DeviceId Executor;
+    uint32_t nActInfos;
+    Scene_ids_t *ActInfos;
 }DetermineResult;
+
 typedef struct {
     DeviceId NotifiedDev;
     DeviceId ConfiguredDev;
@@ -179,17 +212,28 @@ typedef struct
     /* data */
 }ControlResult;
 
+//typedef struct {
+  //  uint16_t Length;
+    //char* Cmd;
+//}CtrlCommand;
+
 typedef struct {
-    uint16_t Length;
-    char* Cmd;
-}CtrlCommand;
+    uint32_t cmd_no;
+    DeviceId execDev;
+    DevProperties cmd;
+} CtrlCommand;
+
 typedef struct 
 {
-    /* data */
-    DeviceId ExecutorDev;
+    uint32_t task_no;
+    uint32_t schedule_no;
+  //  /* data */
+  //  DeviceId ExecutorDev;
     DeviceId Scheduler;
-    CtrlCommand* cmd;
-}ExecutionResult;
+    uint32_t nCmds;
+    CtrlCommand* Cmds;
+//}ExecutionResult;
+}ExecCmds_t;
 
 
 typedef struct {
@@ -208,21 +252,63 @@ typedef SceneObject ExecutorInfo;
 typedef struct _trigger Trigger;
 
 typedef SceneObject TriggerInfo;
+//Move it ahead
+/*
+typedef enum {
+  DevProp_type_undefined,
+  DevProp_type_epp,
+
+  DevProp_type_last
+} DevProp_type_t;
+
+typedef struct
+{
+    uint32_t l;
+    uint8_t *buf;
+} byte_t;
+
 typedef struct 
 {
-    /* data */
-    //@todo
+    uint32_t task_no;
+    DevProp_type_t type;
+    union {
+        byte_t epp;
+    } data;
 }DevProperties;
+*/
 
 // 触发器状态枚举
+//typedef enum {
+  //  TRIGGER_STATE_TRIGGERED,  // 触发
+    //TRIGGER_STATE_UNTRIGGERED   // 未触发
+//} TriggerState;
+
 typedef enum {
-    TRIGGER_STATE_TRIGGERED,  // 触发
-    TRIGGER_STATE_UNTRIGGERED   // 未触发
-} TriggerState;
+  Cond_unknown,  //init as it, since we have no dev info.
+  Cond_false,
+  Cond_true,
+} ConditionState_t;
+
+// move it ahead, since some one used it before here
+/*
+typedef struct {
+    uint16_t tid;
+    uint8_t  rid;
+    uint8_t id;
+} Scene_ids_t;
+*/
 
 typedef struct {
+  Scene_ids_t condInfo;
+  ConditionState_t state;
+} TriggerState_t;
+
+typedef struct {
+    uint32_t task_no;
     DeviceId TriggerDev;
-    TriggerState state;
+	DeviceId ScheduleDev;
+    uint32_t nTriStates;
+    TriggerState_t *TriStates;
 }TriggerStatus;
 
 

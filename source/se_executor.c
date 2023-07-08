@@ -23,6 +23,8 @@ SE_ERR configureExecutor(Executor* executor, const ExecutorInfo* config, configR
     return SE_SUCCESS;
 }
 
-SE_ERR sceneExecution(Executor* executor, ExecutionResult* cmd) {
+//SE_ERR sceneExecution(Executor* executor, ExecutionResult* cmd) {
+SE_ERR sceneExecution(Executor* executor, const DetermineResult* DetRst, ExecCmds_t *cmds)
+{
     return SE_FAILED;
 }

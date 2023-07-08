@@ -2,46 +2,6 @@
 #include "uhos_ctlv.h"
 
 // utlv_s.h
-/*
-typedef enum {
-    utlv_ctype_start_notused,
-
-    utlv_ctype_uint8,
-    utlv_ctype_sint8,
-    utlv_ctype_uint16,
-    utlv_ctype_sint16,
-    utlv_ctype_uint32,
-    utlv_ctype_sint32,
-    utlv_ctype_uint64,
-    utlv_ctype_sint64,
-    utlv_ctype_enum,
-    utlv_ctype_float,
-    utlv_ctype_double,
-
-    utlv_ctype_string,
-    utlv_ctype_bindata,
-
-    utlv_ctype_arr_uint8,
-    utlv_ctype_arr_sint8,
-    utlv_ctype_arr_uint16,
-    utlv_ctype_arr_sint16,
-    utlv_ctype_arr_uint32,
-    utlv_ctype_arr_sint32,
-    utlv_ctype_arr_uint64,
-    utlv_ctype_arr_sint64,
-    utlv_ctype_arr_enum,
-    utlv_ctype_arr_float,
-    utlv_ctype_arr_double,
-
-    utlv_ctype_object,
-
-    utlv_ctype_last,
-
-    utlv_ctype_array_flag = 0x4000,
-    utlv_ctype_mask = 0xBFFF
-
-} utlv_tag_ctype_t;
-*/
 #define UTLV_T_CT_IS_NUM(i) ((utlv_ctype_uint8 <= (i)) && ((i) <= utlv_ctype_double))
 
 //string, need more space for '\0'
@@ -112,7 +72,7 @@ static uhos_u16 b2d_be_16(const uhos_u8 *buf)
 static uhos_u32 b2d_be_32(const uhos_u8 *buf)
 {
     uhos_u32 ret=0;
-    uhos_s32 i;
+    uhos_u32 i;
 
     for(i=0; i<sizeof(uhos_u32); i++)
         ret = (ret << 8) + buf[i];
@@ -366,7 +326,7 @@ const utlv_s_ctx_t* utlv_s_v1_ctx_get(utlv_s_type_t t)
     if(UTLV_S_TYPE_V1 == t) return &s_v1_ctx;
 
     UTLV_LOGE("type(%d) is not TYPE_V1(%d).", t, UTLV_S_TYPE_V1);
-    return NULL;
+    return UHOS_NULL;
 }
 
 // utlv_s.c
@@ -379,10 +339,10 @@ const utlv_s_ctx_t* utlv_s_ctx_get(utlv_s_type_t t)
 
         default:
         UTLV_LOGE("Not support type %d.", t);
-        return NULL;
+        return UHOS_NULL;
     }
 
-    return NULL;
+    return UHOS_NULL;
 }
 /*
  * so far noting to do
@@ -394,7 +354,7 @@ uhos_void utlv_s_ctx_put(const utlv_s_ctx_t* sctx)
 uhos_u32 utlv_s_get_tlv_num(const utlv_s_ctx_t *sctx, const uhos_u8 *buf, uhos_u32 len)
 {
     uhos_u32 num = 0;
-    uhos_s32 i, ret;
+    uhos_s32 ret;
     utlv_s_t tlv;
     uhos_u32 tmp_len = len;
     const uhos_u8 *tmp_buf = buf;
@@ -722,7 +682,6 @@ static uhos_s32 utlv_dec_object(
     utlv_s_t tlv;
     utlv_data_t tmp_data;
     const utlv_tag_info_t *psubtag;
-    const utlv_tag_info_t *pnumtag;
     uhos_s32 i=0;
 
     tmp_len = pIn_data->buf_l;
@@ -1119,6 +1078,8 @@ static uhos_s32 utlv_free_item_in_array(
         }
         pSubParam += psubtag->item_size;
     }
+
+	return UHOS_SUCCESS;
 }
 
 static uhos_s32 utlv_free_inter(

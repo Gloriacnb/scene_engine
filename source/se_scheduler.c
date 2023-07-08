@@ -23,16 +23,18 @@ SE_ERR loadSceneTemplateFile(Scheduler* scheduler, TemplateInfo* templateFile) {
     assert(sch);
     assert(templateFile);
     uint8_t* TemplateData = calloc(templateFile->TemplateSize, 1);
+    assert(TemplateData);
     int32_t LoadBytes = uhos_scene_data_load(templateFile->TemplateId, templateFile->TemplateType, 0, TemplateData, templateFile->TemplateSize);
     assert(LoadBytes > 0);
-    if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) == SE_SUCCESS ) {
-        sch->SceneId = sch->TemplateData.Id;
-        sch->SceneVer = sch->TemplateData.Id;
-        sch->LocalAbility = 7;
-        getLocalDeviceId(&sch->LocalDev);
-        sch->PairDevList = NULL;
+    if( parseTLV(TemplateData, LoadBytes, &sch->TemplateData) != SE_SUCCESS ) {
+        return SE_FAILED;
     }
-
+    sch->SceneId = sch->TemplateData.Id;
+    sch->SceneVer = sch->TemplateData.Version;
+    sch->LocalAbility = templateFile->LocalAbility;
+    sch->LocalDev = templateFile->LocalDevId;
+    sch->PairDevList = NULL;
+    sch->state = IDLE;
     return SE_SUCCESS;
 }
 
@@ -49,9 +51,7 @@ SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_
     return SE_FAILED;    
 }
 
-
-SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
-    
+static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
     // 检查调度器和设备信息是否为空
     if (scheduler == NULL || pairDeviceInfo == NULL || executorInfo == NULL) {
         return SE_FAILED;
@@ -59,40 +59,51 @@ SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo
     __scheduler* sch = (__scheduler*)scheduler;
     // 配对执行
     if( HaveBeenPaired(scheduler, &pairDeviceInfo->PairDev) ) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return SE_HAVE_BEEN_PARIED;
     }
     //需要输出的执行器配置数据
     SceneInfo* pSceneConfig = &executorInfo->TemplateInfo;
-
+    pSceneConfig = calloc(sizeof(SceneInfo), 1);
+    assert(pSceneConfig);
     //首先使用执行设备预置数据初始化 配置数据
     SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, pSceneConfig);
     if(rst != SE_SUCCESS) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return rst;
     }
     //判断预置信息与模板信息是否匹配
     if( isSceneMatch(scheduler, pSceneConfig) != SE_SUCCESS ) {
+
+        DebugPrint("$$$$$$$ERR-%d\n", __LINE__);
         return SE_FAILED;
     }
     //读取模板内配置数据 填充执行器配置
     rst = fillWithTemplateData(scheduler, pSceneConfig);
     if(rst != SE_SUCCESS) {
+        DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return rst;
     }
 
     // 其它executor配置信息
     executorInfo->optype = 0;
-    executorInfo->role = 1;
+    executorInfo->role = Role;
     executorInfo->Obj = chooseWhereToCreate(scheduler, pairDeviceInfo);
     executorInfo->ObjDev = pairDeviceInfo->PairDev;
     executorInfo->Scheduler = sch->LocalDev;
 
-    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, PAIRED);
+    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, Role, PAIRED);
     return SE_SUCCESS;
 }
 
-SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
-    return pairExecutorDevice(scheduler, deviceInfo, triggerInfo);
+SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
+    return PairDevice(scheduler, pairDeviceInfo, 1, executorInfo);
 }
+
+SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
+    return PairDevice(scheduler, deviceInfo, 0, triggerInfo);
+}
+
 SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
     if (scheduler == NULL || configResult == NULL) {
         return SE_FAILED;
@@ -117,7 +128,31 @@ SE_ERR determineSceneExecution(Scheduler* scheduler, const TriggerStatus* trigge
     return SE_FAILED;
 }
 
+DeviceInfoList getPairedDeviceList(const Scheduler* scheduler) {
 
+
+    DeviceInfoList deviceList;
+    memset(&deviceList, 0, sizeof(DeviceInfoList));
+    __scheduler* sch = (__scheduler*)scheduler;
+    if( sch == NULL ) {
+        return deviceList;
+    }
+    const PairStatus* current = sch->PairDevList;
+
+    while (current != NULL) {
+        if (current->state == SYNCED) {
+            if (current->Role == 0) {
+                deviceList.TriggerDevCnt++;
+            }
+            else {
+                deviceList.ExecutorDevCnt++;
+            }
+        }
+        current = current->next;
+    }
+
+    return deviceList;
+}
 /* inner functions */
 
 
@@ -139,6 +174,9 @@ static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneIn
         if( parseTLV(pairDeviceInfo->block.TData.data, pairDeviceInfo->block.TData.len, sinfo) == SE_SUCCESS ) {
             return SE_SUCCESS;
         }
+        else {
+            DebugPrint("$$$$$$$ERR-parseTLV");
+        }
     }
 
     return SE_FAILED;
@@ -150,6 +188,8 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo) {
     }
     __scheduler* sch = (__scheduler*)scheduler;
     assert(sch);
+    DebugPrint("+++++++sinfo Id:%d Version:%d\n ", sinfo->Id, sinfo->Version);
+    DebugPrint("++++++++Scheduler Id:%d Version:%d\n ", sch->SceneId, sch->SceneVer);
     if( (sch->SceneId == sinfo->Id) && (sch->SceneVer == sinfo->Version) ) {
         return SE_SUCCESS;
     } 
@@ -255,13 +295,14 @@ static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid) {
     return isDeviceIdInList(sch->PairDevList, devid);
 }
 
-static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, PairState state) {
+static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, uint8_t Role, PairState state) {
     PairStatus* newPairStatus = (PairStatus*)malloc(sizeof(PairStatus));
     if (newPairStatus == NULL) {
         return SE_ALLOCATE_MEMORY;
     }
 
     newPairStatus->PairDev = *deviceId;
+    newPairStatus->Role = Role;
     newPairStatus->state = state;
     newPairStatus->next = NULL;
 
@@ -461,6 +502,7 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
 
     utlv_free(sceneInfo->tlv_ctx, &gSceneInfo_tag_info, sceneInfo, 0);
     utlv_put_ctx(sceneInfo->tlv_ctx);
+	sceneInfo->tlv_ctx = UHOS_NULL;
 }
 
 /*

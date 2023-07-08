@@ -31,6 +31,7 @@ build_config:                              # <可选项> 编译配置项
     - -Dxx1
   define:
     - CONFIG_XXX ? <CONFIG_XXX>
+    - CONFIG_SCENE_ENGINE ? <CONFIG_SCENE_ENGINE>
   
 source_file:                               # <可选项> 指定参与编译的源代码文件，支持通配符，采用相对路径
   normal:
@@ -48,3 +49,4 @@ export:
 ## 第六部分：配置信息
 def_config:                                # 组件的可配置项
     CONFIG_DEBUG: y
+    CONFIG_SCENE_ENGINE: n

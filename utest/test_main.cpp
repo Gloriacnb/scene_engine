@@ -32,13 +32,15 @@ TEST(ScenePairDevice, TestPairExecutor)
 {
     Scheduler* sh = makeNullSchedulerHandle();
     TemplateInfo info;
+    info.TemplateSize = 1024;
+    strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
     auto rtn = loadSceneTemplateFile(sh, &info);
     EXPECT_EQ(rtn, SE_SUCCESS);
     DeviceInfo dev_info;
     strcpy(dev_info.PairDev.id, EXEC_DEV_ID);
     dev_info.devAbility = 0;
     dev_info.presetting_type = 1;
-    dev_info.block.Tinfo.Id = 121;
+    dev_info.block.Tinfo.Id = 100;
     dev_info.block.Tinfo.Version = 1;
     dev_info.block.Tinfo.RuleNum = 2;
     dev_info.block.Tinfo.Rules = new RuleInfo[2];
@@ -52,8 +54,8 @@ TEST(ScenePairDevice, TestPairExecutor)
     ExecutorInfo ExeInfo;
     EXPECT_EQ(pairExecutorDevice(sh, &dev_info, &ExeInfo), SE_SUCCESS);
     EXPECT_EQ(ExeInfo.role, 1);
-    EXPECT_STREQ(ExeInfo.Executor.id, LOCAL_DEV_ID);
-    EXPECT_STREQ(ExeInfo.ExecutorDev.id, EXEC_DEV_ID);
+    EXPECT_STREQ(ExeInfo.Obj.id, LOCAL_DEV_ID);
+    EXPECT_STREQ(ExeInfo.ObjDev.id, EXEC_DEV_ID);
 
 }
 

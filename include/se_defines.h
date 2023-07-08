@@ -18,6 +18,7 @@
 #define SE_DEFINES_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,7 +108,7 @@ typedef union
 
 //设备ID MAC TempID
 typedef struct {
-    char id[32];
+    char id[33];
     char TempId[16];
     char BleMac[6];
 }DeviceId;
@@ -145,8 +146,9 @@ typedef struct {
 typedef struct 
 {
     uint32_t TemplateId;
-    uint32_t TemplateType;
     uint32_t TemplateSize;
+    uint16_t TemplateType;
+    DeviceId LocalDevId;
     uint8_t LocalAbility;
 }TemplateInfo;
 
@@ -220,6 +222,13 @@ typedef struct {
     DeviceId TriggerDev;
     TriggerState state;
 }TriggerStatus;
+
+
+#ifdef DEBUG_PRINT
+#define DebugPrint(format, ...) printf( format, ##__VA_ARGS__)
+#else
+#define DebugPrint(format, ...)
+#endif
 
 
 #ifdef __cplusplus

@@ -1,10 +1,4 @@
 *.mk
-out
-log.yaml
 build
-utest/build
-
-.vscode/launch.json
-.vscode/tasks.json
-.vscode/settings.json
-.VSCodeCounter/
+cmake_build
+.vscode

@@ -72,7 +72,7 @@ static uhos_u16 b2d_be_16(const uhos_u8 *buf)
 static uhos_u32 b2d_be_32(const uhos_u8 *buf)
 {
     uhos_u32 ret=0;
-    uhos_s32 i;
+    uhos_u32 i;
 
     for(i=0; i<sizeof(uhos_u32); i++)
         ret = (ret << 8) + buf[i];

@@ -3,6 +3,7 @@
 #include "trigger_inner.h"
 #include <stdlib.h>
 
+
 Trigger* makeNullTriggerHandle(void) {
     __trigger* tri = calloc(sizeof(__trigger), 1);
     return (Trigger*)tri;    

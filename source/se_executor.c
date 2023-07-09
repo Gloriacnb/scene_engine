@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 Executor* makeNullExecutorHandle(void) {
-    __executor* exec = calloc(sizeof(__executor), 1);
+    __executor* exec = calloc(1, sizeof(__executor));
     return (Executor*)exec;       
 }
 

@@ -8,7 +8,7 @@
 #include "uhos_ctlv.h"
 
 Scheduler* makeNullSchedulerHandle(void) {
-    __scheduler* sch = calloc(sizeof(__scheduler), 1);
+    __scheduler* sch = calloc(1, sizeof(__scheduler));
     assert(sch);
     sch->state = IDLE;
     return (Scheduler*)sch;
@@ -401,7 +401,7 @@ static const utlv_tag_info_t gSceneActionInfoObj_tags[] = {
 
 static const utlv_tag_info_t gSceneActGrps_tags[] = {
   {0x233f, sizeof(uhos_u8), offsetof(ActionGroup, ActsNum), utlv_ctype_uint8,0,0,0,0,0,UHOS_NULL},
-  {0x2330, sizeof(uhos_u8), offsetof(ActionGroup,actionIds), utlv_ctype_arr_uint8,1,0,0,0x233f,0,UHOS_NULL},
+//   {0x2330, sizeof(uhos_u8), offsetof(ActionGroup,actionIds), utlv_ctype_arr_uint8,1,0,0,0x233f,0,UHOS_NULL},
   {0x2340, sizeof(ActionInfo), offsetof(ActionGroup,actions), utlv_ctype_array_flag,1,0,0,0x233f,
     1, gSceneActionInfoObj_tags}
 };
@@ -684,6 +684,7 @@ RuleInfo* DeepCopyRuleInfo(const RuleInfo* src) {
     }
     
     // 拷贝结构体内容
+    //@todo 未包含 expression 和 Cids 字段
     memcpy(dst, src, sizeof(RuleInfo));
     
     // 深拷贝 Conditions 数组

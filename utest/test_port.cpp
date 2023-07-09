@@ -19,7 +19,7 @@
 extern "C" {
 
 uint32_t uhos_scene_data_load(uint32_t id, uint32_t type, uint32_t offset, uint8_t* data, uint32_t data_len) {
-    std::ifstream file("/home/peter/work/scene-dev/services/scene_engine/utest/test_tlv_v1_01.bin", std::ios::binary);
+    std::ifstream file("/home/peter/work/scene-dev/services/scene_engine/utest/test_tlv_v1_scheduler.bin", std::ios::binary);
 
     if (!file) {
         std::cout << "Failed to open file" << std::endl;

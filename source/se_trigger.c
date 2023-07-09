@@ -5,7 +5,7 @@
 
 
 Trigger* makeNullTriggerHandle(void) {
-    __trigger* tri = calloc(sizeof(__trigger), 1);
+    __trigger* tri = calloc(1, sizeof(__trigger));
     return (Trigger*)tri;    
 }
 SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResult* result) {

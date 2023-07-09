@@ -29,7 +29,9 @@ typedef enum {
     SE_FAILED = -1,
     SE_HAVE_BEEN_PARIED = -2,
     SE_ALLOCATE_MEMORY = -3,
-    
+    SE_ERR_INVALID_ARGUMENT = -4,
+    SE_ERR_OUT_OF_MEMORY = -5,
+
 }SE_ERR;
 
 /******************* 调度器数据结构定义 *********************/

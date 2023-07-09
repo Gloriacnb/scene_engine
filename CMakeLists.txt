@@ -3,6 +3,8 @@ project(scene_engine)
 
 # 设置 C 标准
 set(CMAKE_C_STANDARD 11)
+# 指定C ++标准
+set(CMAKE_CXX_STANDARD 11)
 
 # 添加 scene_engine 库
 add_library(scene_engine STATIC
@@ -14,7 +16,7 @@ add_library(scene_engine STATIC
 
 target_include_directories(scene_engine
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source/include
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/source/include
 )
 
 target_compile_options(scene_engine PRIVATE -Wall -Wextra)

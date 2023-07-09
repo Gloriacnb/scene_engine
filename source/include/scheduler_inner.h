@@ -59,16 +59,17 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo);
 
 static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo);
 
-static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid);
+static bool haveBeenPaired(Scheduler* scheduler, const DeviceId* devid);
 static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, uint8_t Role, PairState state);
 static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const DeviceId* deviceId);
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
-
+static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo);
+static SE_ERR unpairAllDevice(Scheduler* scheduler);
 static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 
 // static void freeSceneInfo(SceneInfo* sceneInfo);
-
+SE_ERR deepCopySceneInfo(const SceneInfo* src, SceneInfo* dst);
 
 #ifdef __cplusplus
 }

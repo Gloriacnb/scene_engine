@@ -51,20 +51,19 @@ SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_
     return SE_FAILED;    
 }
 
-static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
+static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
     // 检查调度器和设备信息是否为空
     if (scheduler == NULL || pairDeviceInfo == NULL || executorInfo == NULL) {
         return SE_FAILED;
     }
     __scheduler* sch = (__scheduler*)scheduler;
     // 配对执行
-    if( HaveBeenPaired(scheduler, &pairDeviceInfo->PairDev) ) {
+    if( haveBeenPaired(scheduler, &pairDeviceInfo->PairDev) ) {
         DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return SE_HAVE_BEEN_PARIED;
     }
     //需要输出的执行器配置数据
     SceneInfo* pSceneConfig = &executorInfo->TemplateInfo;
-    pSceneConfig = calloc(sizeof(SceneInfo), 1);
     assert(pSceneConfig);
     //首先使用执行设备预置数据初始化 配置数据
     SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, pSceneConfig);
@@ -97,11 +96,11 @@ static SE_ERR PairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo,
 }
 
 SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
-    return PairDevice(scheduler, pairDeviceInfo, 1, executorInfo);
+    return pairDevice(scheduler, pairDeviceInfo, 1, executorInfo);
 }
 
 SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, TriggerInfo* triggerInfo) {
-    return PairDevice(scheduler, deviceInfo, 0, triggerInfo);
+    return pairDevice(scheduler, deviceInfo, 0, triggerInfo);
 }
 
 SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult* configResult) {
@@ -166,7 +165,7 @@ static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pair
 static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo) {
     assert(pairDeviceInfo);
     if( pairDeviceInfo->presetting_type == 1 ) {
-        *sinfo = pairDeviceInfo->block.Tinfo;
+        DeepCopySceneInfo(&pairDeviceInfo->block.Tinfo, sinfo);
         return SE_SUCCESS;
     }
     //@todo 如果是块数据，需要解析并转化为SceneInfo 再输出
@@ -290,7 +289,7 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
     return SE_SUCCESS;
 }
 
-static bool HaveBeenPaired(Scheduler* scheduler, const DeviceId* devid) {
+static bool haveBeenPaired(Scheduler* scheduler, const DeviceId* devid) {
     __scheduler* sch = (__scheduler*)scheduler;
     return isDeviceIdInList(sch->PairDevList, devid);
 }
@@ -587,3 +586,156 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
 }
 */
 
+// 深拷贝 ConditionInfo 结构体
+ConditionInfo* DeepCopyConditionInfo(const ConditionInfo* src) {
+    if (src == NULL) {
+        return NULL;
+    }
+    
+    ConditionInfo* dst = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+    if (dst == NULL) {
+        return NULL;
+    }
+    
+    // 拷贝结构体内容
+    memcpy(dst, src, sizeof(ConditionInfo));
+    
+    // 深拷贝 value 字节数组
+    if (src->value != NULL) {
+        dst->value = (char*)malloc(src->nBytesValue);
+        if (dst->value == NULL) {
+            free(dst);
+            return NULL;
+        }
+        
+        memcpy(dst->value, src->value, src->nBytesValue);
+    }
+    
+    return dst;
+}
+
+// 深拷贝 ActionInfo 结构体
+ActionInfo* DeepCopyActionInfo(const ActionInfo* src) {
+    if (src == NULL) {
+        return NULL;
+    }
+    
+    ActionInfo* dst = (ActionInfo*)malloc(sizeof(ActionInfo));
+    if (dst == NULL) {
+        return NULL;
+    }
+    
+    // 拷贝结构体内容
+    memcpy(dst, src, sizeof(ActionInfo));
+    
+    // 深拷贝 ActCmd 字节数组
+    if (src->ActCmd != NULL) {
+        dst->ActCmd = (char*)malloc(src->nBtesActCmd);
+        if (dst->ActCmd == NULL) {
+            free(dst);
+            return NULL;
+        }
+        
+        memcpy(dst->ActCmd, src->ActCmd, src->nBtesActCmd);
+    }
+    
+    return dst;
+}
+
+// 深拷贝 ActionGroup 结构体
+ActionGroup* DeepCopyActionGroup(const ActionGroup* src) {
+    if (src == NULL) {
+        return NULL;
+    }
+    
+    ActionGroup* dst = (ActionGroup*)malloc(sizeof(ActionGroup));
+    if (dst == NULL) {
+        return NULL;
+    }
+    
+    // 拷贝结构体内容
+    memcpy(dst, src, sizeof(ActionGroup));
+    
+    // 深拷贝 actions 数组
+    if (src->ActsNum > 0 && src->actions != NULL) {
+        dst->actions = (ActionInfo*)malloc(src->ActsNum * sizeof(ActionInfo));
+        if (dst->actions == NULL) {
+            free(dst);
+            return NULL;
+        }
+        
+        for (int i = 0; i < src->ActsNum; i++) {
+            dst->actions[i] = *DeepCopyActionInfo(&(src->actions[i]));
+        }
+    }
+    
+    return dst;
+}
+
+// 深拷贝 RuleInfo 结构体
+RuleInfo* DeepCopyRuleInfo(const RuleInfo* src) {
+    if (src == NULL) {
+        return NULL;
+    }
+    
+    RuleInfo* dst = (RuleInfo*)malloc(sizeof(RuleInfo));
+    if (dst == NULL) {
+        return NULL;
+    }
+    
+    // 拷贝结构体内容
+    memcpy(dst, src, sizeof(RuleInfo));
+    
+    // 深拷贝 Conditions 数组
+    if (src->ConditionNum > 0 && src->Conditions != NULL) {
+        dst->Conditions = (ConditionInfo*)malloc(src->ConditionNum * sizeof(ConditionInfo));
+        if (dst->Conditions == NULL) {
+            free(dst);
+            return NULL;
+        }
+        
+        for (int i = 0; i < src->ConditionNum; i++) {
+            dst->Conditions[i] = *DeepCopyConditionInfo(&(src->Conditions[i]));
+        }
+    }
+    
+    // 深拷贝 ActionGs 数组
+    if (src->ActionGNum > 0 && src->ActionGs != NULL) {
+        dst->ActionGs = (ActionGroup*)malloc(src->ActionGNum * sizeof(ActionGroup));
+        if (dst->ActionGs == NULL) {
+            free(dst->Conditions);
+            free(dst);
+            return NULL;
+        }
+        
+        for (int i = 0; i < src->ActionGNum; i++) {
+            dst->ActionGs[i] = *DeepCopyActionGroup(&(src->ActionGs[i]));
+        }
+    }
+    
+    return dst;
+}
+
+// 深拷贝 SceneInfo 结构体
+SE_ERR DeepCopySceneInfo(const SceneInfo* src, SceneInfo* dst) {
+    if (src == NULL || dst == NULL) {
+        return SE_ERR_INVALID_ARGUMENT;
+    }
+    
+    // 拷贝结构体内容
+    memcpy(dst, src, sizeof(SceneInfo));
+    
+    // 深拷贝 Rules 数组
+    if (src->RuleNum > 0 && src->Rules != NULL) {
+        dst->Rules = (RuleInfo*)malloc(src->RuleNum * sizeof(RuleInfo));
+        if (dst->Rules == NULL) {
+            return SE_ERR_OUT_OF_MEMORY;
+        }
+        
+        for (int i = 0; i < src->RuleNum; i++) {
+            dst->Rules[i] = *DeepCopyRuleInfo(&(src->Rules[i]));
+        }
+    }
+    
+    return SE_SUCCESS;
+}

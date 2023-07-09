@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(scene_engine)
 
-# 设置 C 标准
-set(CMAKE_C_STANDARD 11)
-
-# 添加 scene_engine 库
+# 添加您的源文件
 add_library(scene_engine STATIC
     source/se_executor.c
     source/se_scheduler.c
@@ -14,7 +11,7 @@ add_library(scene_engine STATIC
 
 target_include_directories(scene_engine
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source/include
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/source/include
 )
 
 target_compile_options(scene_engine PRIVATE -Wall -Wextra)

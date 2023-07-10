@@ -718,7 +718,7 @@ RuleInfo* DeepCopyRuleInfo(const RuleInfo* src) {
 }
 
 // 深拷贝 SceneInfo 结构体
-SE_ERR DeepCopySceneInfo(const SceneInfo* src, SceneInfo* dst) {
+SE_ERR deepCopySceneInfo(const SceneInfo* src, SceneInfo* dst) {
     if (src == NULL || dst == NULL) {
         return SE_ERR_INVALID_ARGUMENT;
     }

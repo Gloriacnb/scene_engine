@@ -165,7 +165,7 @@ static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pair
 static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo) {
     assert(pairDeviceInfo);
     if( pairDeviceInfo->presetting_type == 1 ) {
-        DeepCopySceneInfo(&pairDeviceInfo->block.Tinfo, sinfo);
+        deepCopySceneInfo(&pairDeviceInfo->block.Tinfo, sinfo);
         return SE_SUCCESS;
     }
     //@todo 如果是块数据，需要解析并转化为SceneInfo 再输出

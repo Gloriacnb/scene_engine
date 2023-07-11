@@ -68,6 +68,7 @@ SE_ERR pairTriggerDevice(Scheduler* scheduler, const DeviceInfo* deviceInfo, Tri
  */
 SE_ERR triggerConfigResultNotification(Scheduler* scheduler, const configResult* configResult);
 
+SE_ERR unpairAllDevice(Scheduler* scheduler);
 /**
  * @brief 触发器数据删除结果通知
  * @param scheduler 

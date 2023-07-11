@@ -66,7 +66,7 @@ static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo,
     SceneInfo* pSceneConfig = &executorInfo->TemplateInfo;
     assert(pSceneConfig);
     //首先使用执行设备预置数据初始化 配置数据
-    SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, pSceneConfig);
+    SE_ERR rst = getPresettingSceneConfig(pairDeviceInfo, Role, pSceneConfig);
     if(rst != SE_SUCCESS) {
         DebugPrint("$$$$$$$ERR-%d", __LINE__);
         return rst;
@@ -152,6 +152,13 @@ DeviceInfoList getPairedDeviceList(const Scheduler* scheduler) {
 
     return deviceList;
 }
+
+SE_ERR unpairAllDevice(Scheduler* scheduler) {
+    // __scheduler* sch = (__scheduler*)scheduler;
+    
+    return SE_FAILED;
+}
+
 /* inner functions */
 
 
@@ -162,15 +169,55 @@ static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pair
     return sch->LocalDev;
 }
 
-static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo) {
+void copyConditionsId(SceneInfo* info) {
+    for (size_t i = 0; i < info->RuleNum; i++)
+    {
+        if(info->Rules[i].Conditions == NULL) {
+            info->Rules[i].Conditions = calloc(info->Rules[i].ConditionNum, sizeof(ConditionInfo));
+            assert(info->Rules[i].Conditions);
+        }
+        for (size_t j = 0; j < info->Rules[i].ConditionNum; j++) {
+            info->Rules[i].Conditions[j].CondId = info->Rules[i].Cids[j];
+
+        }
+        
+    }
+    
+}
+void copyActionsId(SceneInfo* info) {
+    for (size_t i = 0; i < info->RuleNum; i++)
+    {
+        for (size_t j = 0; j < info->Rules[i].ActionGNum; j++)
+        {
+            if( info->Rules[i].ActionGs[j].actions == NULL ) {
+                info->Rules[i].ActionGs[j].actions = calloc(info->Rules[i].ActionGs[j].ActsNum, sizeof(ActionInfo));
+                assert(info->Rules[i].ActionGs[j].actions);
+            }
+            for (size_t k = 0; k < info->Rules[i].ActionGs[j].ActsNum; k++)
+            {
+                info->Rules[i].ActionGs[j].actions[k].ActId = info->Rules[i].ActionGs[j].actionIds[k];
+            }
+            
+        }
+        
+    }
+    
+}
+
+static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, uint8_t Role, SceneInfo* sinfo) {
     assert(pairDeviceInfo);
     if( pairDeviceInfo->presetting_type == 1 ) {
-        deepCopySceneInfo(&pairDeviceInfo->block.Tinfo, sinfo);
-        return SE_SUCCESS;
+        return deepCopySceneInfo(&pairDeviceInfo->block.Tinfo, sinfo);
     }
     //@todo 如果是块数据，需要解析并转化为SceneInfo 再输出
     else {
         if( parseTLV(pairDeviceInfo->block.TData.data, pairDeviceInfo->block.TData.len, sinfo) == SE_SUCCESS ) {
+            if( Role == 0 ) {
+                copyConditionsId(sinfo);
+            }
+            else {
+                copyActionsId(sinfo);
+            }
             return SE_SUCCESS;
         }
         else {
@@ -187,8 +234,7 @@ static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo) {
     }
     __scheduler* sch = (__scheduler*)scheduler;
     assert(sch);
-    DebugPrint("+++++++sinfo Id:%d Version:%d\n ", sinfo->Id, sinfo->Version);
-    DebugPrint("++++++++Scheduler Id:%d Version:%d\n ", sch->SceneId, sch->SceneVer);
+
     if( (sch->SceneId == sinfo->Id) && (sch->SceneVer == sinfo->Version) ) {
         return SE_SUCCESS;
     } 
@@ -254,9 +300,12 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                 for (size_t j = 0; j < fillinfo->ConditionNum; j++)
                 {
                     ConditionInfo* fillCond = &fillinfo->Conditions[j];
+                    assert(fillCond);
                     ConditionInfo* srcCond = getRuleCondition(sourceinfo, fillCond->CondId);
+                    assert(srcCond);
                     if( srcCond ) {
-                        *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                        // *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                        deepCopyConditionInfo(srcCond, fillCond);
                     }
                     else {
                         //@todo 模板数据中无匹配的 条件ID，需要错误处理
@@ -273,7 +322,8 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                         ActionInfo* fillAction = &ActGroup->actions[k];
                         ActionInfo* srcAction = getRuleAction(sourceinfo, fillAction->ActId);
                         if( srcAction ) {
-                            *fillAction = *srcAction; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                            // *fillAction = *srcAction; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
+                            deepCopyActionInfo(srcAction, fillAction);
                         }
                         else {
                             //@todo 模板数据中无匹配的 动作ID，需要错误处理
@@ -506,237 +556,252 @@ static void freeSceneInfo(SceneInfo* sceneInfo) {
 	sceneInfo->tlv_ctx = UHOS_NULL;
 }
 
-/*
-static void parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo) {
-    uint16_t index = 0;
 
-    // 解析 TLV 数据
-    while (index < length) {
-        uint8_t tag = data[index++];
-        uint8_t length = data[index++];
-        const uint8_t* value = &data[index];
-
-        // 根据 tag 解析对应的字段
-        switch (tag) {
-            case 0x01: {
-                sceneInfo->Id = (value[0] << 8) | value[1];
-                break;
-            }
-            case 0x02: {
-                sceneInfo->Version = (value[0] << 8) | value[1];
-                break;
-            }
-            case 0x03: {
-                sceneInfo->RuleNum = value[0];
-                sceneInfo->Rules = (RuleInfo*)malloc(sizeof(RuleInfo) * sceneInfo->RuleNum);
-
-                uint8_t ruleIndex = 0;
-                uint16_t ruleOffset = 1;
-                while (ruleIndex < sceneInfo->RuleNum) {
-                    RuleInfo* rule = &(sceneInfo->Rules[ruleIndex]);
-
-                    rule->RuleId = value[ruleOffset++];
-                    rule->ConditionNum = value[ruleOffset++];
-                    rule->Conditions = (ConditionInfo*)malloc(sizeof(ConditionInfo) * rule->ConditionNum);
-
-                    // 解析条件信息
-                    for (uint8_t condIndex = 0; condIndex < rule->ConditionNum; condIndex++) {
-                        ConditionInfo* condition = &(rule->Conditions[condIndex]);
-
-                        condition->CondId = value[ruleOffset++];
-                        // 解析其他字段，请根据实际情况进行修改和完善
-                    }
-
-                    rule->ActionNum = value[ruleOffset++];
-                    rule->Actions = (ActionInfo*)malloc(sizeof(ActionInfo) * rule->ActionNum);
-
-                    // 解析动作信息
-                    for (uint8_t actIndex = 0; actIndex < rule->ActionNum; actIndex++) {
-                        ActionInfo* action = &(rule->Actions[actIndex]);
-
-                        action->ActId = value[ruleOffset++];
-                        // 解析其他字段，请根据实际情况进行修改和完善
-                    }
-
-                    ruleIndex++;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-
-        index += length;
-    }
-}
-
-static void freeSceneInfo(SceneInfo* sceneInfo) {
-    if (sceneInfo == NULL) {
-        return;
+SE_ERR deepCopyConditionInfo(const ConditionInfo* src, ConditionInfo* dst) {
+    if (src == NULL || dst == NULL) {
+        return SE_ERR_INVALID_ARGUMENT;
     }
 
-    for (uint8_t ruleIndex = 0; ruleIndex < sceneInfo->RuleNum; ruleIndex++) {
-        RuleInfo* rule = &(sceneInfo->Rules[ruleIndex]);
-
-        free(rule->Conditions);
-        free(rule->Actions);
-    }
-
-    free(sceneInfo->Rules);
-}
-*/
-
-// 深拷贝 ConditionInfo 结构体
-ConditionInfo* DeepCopyConditionInfo(const ConditionInfo* src) {
-    if (src == NULL) {
-        return NULL;
-    }
-    
-    ConditionInfo* dst = (ConditionInfo*)malloc(sizeof(ConditionInfo));
-    if (dst == NULL) {
-        return NULL;
-    }
-    
-    // 拷贝结构体内容
+    // Copy non-pointer members
     memcpy(dst, src, sizeof(ConditionInfo));
-    
-    // 深拷贝 value 字节数组
+
+    // Allocate memory for value field if necessary
     if (src->value != NULL) {
-        dst->value = (char*)malloc(src->nBytesValue);
+        dst->value = (char*)calloc(src->nBytesValue, sizeof(char));
         if (dst->value == NULL) {
-            free(dst);
-            return NULL;
+            return SE_ERR_OUT_OF_MEMORY;
         }
-        
         memcpy(dst->value, src->value, src->nBytesValue);
     }
-    
-    return dst;
+
+    return SE_SUCCESS;
 }
 
+
 // 深拷贝 ActionInfo 结构体
-ActionInfo* DeepCopyActionInfo(const ActionInfo* src) {
-    if (src == NULL) {
-        return NULL;
+SE_ERR deepCopyActionInfo(const ActionInfo* src, ActionInfo* dst) {
+    if (src == NULL || dst == NULL) {
+        return SE_ERR_INVALID_ARGUMENT;
     }
-    
-    ActionInfo* dst = (ActionInfo*)malloc(sizeof(ActionInfo));
-    if (dst == NULL) {
-        return NULL;
-    }
-    
-    // 拷贝结构体内容
+
+    // Copy non-pointer members
     memcpy(dst, src, sizeof(ActionInfo));
-    
-    // 深拷贝 ActCmd 字节数组
+
+    // Allocate memory for ActCmd field if necessary
     if (src->ActCmd != NULL) {
-        dst->ActCmd = (char*)malloc(src->nBtesActCmd);
+        dst->ActCmd = (char*)calloc(src->nBtesActCmd, sizeof(char));
         if (dst->ActCmd == NULL) {
-            free(dst);
-            return NULL;
+            return SE_ERR_OUT_OF_MEMORY;
         }
-        
         memcpy(dst->ActCmd, src->ActCmd, src->nBtesActCmd);
     }
-    
-    return dst;
+
+    return SE_SUCCESS;
 }
 
 // 深拷贝 ActionGroup 结构体
-ActionGroup* DeepCopyActionGroup(const ActionGroup* src) {
-    if (src == NULL) {
-        return NULL;
+SE_ERR deepCopyActionGroup(const ActionGroup* src, ActionGroup* dst) {
+    if (src == NULL || dst == NULL) {
+        return SE_ERR_INVALID_ARGUMENT;
     }
-    
-    ActionGroup* dst = (ActionGroup*)malloc(sizeof(ActionGroup));
-    if (dst == NULL) {
-        return NULL;
+
+    // Copy non-pointer members
+    dst->ActsNum = src->ActsNum;
+
+    // Allocate memory for actionIds array if necessary
+    if (src->ActsNum > 0 && src->actionIds != NULL) {
+        dst->actionIds = (uint8_t*)calloc(src->ActsNum, sizeof(uint8_t));
+        if (dst->actionIds == NULL) {
+            return SE_ERR_OUT_OF_MEMORY;
+        }
+        memcpy(dst->actionIds, src->actionIds, src->ActsNum * sizeof(uint8_t));
     }
-    
-    // 拷贝结构体内容
-    memcpy(dst, src, sizeof(ActionGroup));
-    
-    // 深拷贝 actions 数组
+
+    // Allocate memory for actions array if necessary
     if (src->ActsNum > 0 && src->actions != NULL) {
-        dst->actions = (ActionInfo*)malloc(src->ActsNum * sizeof(ActionInfo));
-        if (dst->actions == NULL) {
-            free(dst);
-            return NULL;
+        if( dst->actions == NULL ) {
+            dst->actions = (ActionInfo*)calloc(src->ActsNum, sizeof(ActionInfo));
+            if (dst->actions == NULL) {
+                // Clean up previously allocated memory
+                if (dst->actionIds != NULL) {
+                    free(dst->actionIds);
+                    dst->actionIds = NULL;
+                }
+                return SE_ERR_OUT_OF_MEMORY;
+            }
         }
-        
+
         for (int i = 0; i < src->ActsNum; i++) {
-            dst->actions[i] = *DeepCopyActionInfo(&(src->actions[i]));
+            SE_ERR result = deepCopyActionInfo(&(src->actions[i]), &(dst->actions[i]));
+            if (result != SE_SUCCESS) {
+                // Clean up previously allocated memory
+                free(dst->actionIds);
+                free(dst->actions);
+                dst->actionIds = NULL;
+                dst->actions = NULL;
+                return result;
+            }
         }
     }
-    
-    return dst;
+
+    return SE_SUCCESS;
 }
 
+
 // 深拷贝 RuleInfo 结构体
-RuleInfo* DeepCopyRuleInfo(const RuleInfo* src) {
-    if (src == NULL) {
-        return NULL;
+SE_ERR deepCopyRuleInfo(const RuleInfo* src, RuleInfo* dst) {
+    if (src == NULL || dst == NULL) {
+        return SE_ERR_INVALID_ARGUMENT;
     }
-    
-    RuleInfo* dst = (RuleInfo*)malloc(sizeof(RuleInfo));
-    if (dst == NULL) {
-        return NULL;
+
+    // Copy non-pointer members
+    dst->RuleId = src->RuleId;
+    dst->salience = src->salience;
+    dst->status = src->status;
+    dst->exprType = src->exprType;
+
+    // Allocate memory for expression if necessary
+    if (src->expression != NULL) {
+        size_t exprLen = strlen(src->expression) + 1;
+        dst->expression = (char*)calloc(exprLen, sizeof(char));
+        if (dst->expression == NULL) {
+            return SE_ERR_OUT_OF_MEMORY;
+        }
+        memcpy(dst->expression, src->expression, exprLen);
+    } else {
+        dst->expression = NULL;
     }
-    
-    // 拷贝结构体内容
-    //@todo 未包含 expression 和 Cids 字段
-    memcpy(dst, src, sizeof(RuleInfo));
-    
-    // 深拷贝 Conditions 数组
+
+    dst->ConditionNum = src->ConditionNum;
+    dst->ActionGNum = src->ActionGNum;
+
+    // Allocate memory for Cids array if necessary
+    if (src->ConditionNum > 0 && src->Cids != NULL) {
+        dst->Cids = (uint8_t*)calloc(src->ConditionNum, sizeof(uint8_t));
+        if (dst->Cids == NULL) {
+            return SE_ERR_OUT_OF_MEMORY;
+        }
+        memcpy(dst->Cids, src->Cids, src->ConditionNum * sizeof(uint8_t));
+    } else {
+        dst->Cids = NULL;
+    }
+
+    // Deep copy Conditions if necessary
     if (src->ConditionNum > 0 && src->Conditions != NULL) {
-        dst->Conditions = (ConditionInfo*)malloc(src->ConditionNum * sizeof(ConditionInfo));
+        dst->Conditions = (ConditionInfo*)calloc(src->ConditionNum, sizeof(ConditionInfo));
         if (dst->Conditions == NULL) {
-            free(dst);
-            return NULL;
+            // Clean up previously allocated memory
+            if (dst->expression != NULL) {
+                free(dst->expression);
+                dst->expression = NULL;
+            }
+            if (dst->Cids != NULL) {
+                free(dst->Cids);
+                dst->Cids = NULL;
+            }
+            return SE_ERR_OUT_OF_MEMORY;
         }
-        
         for (int i = 0; i < src->ConditionNum; i++) {
-            dst->Conditions[i] = *DeepCopyConditionInfo(&(src->Conditions[i]));
+            SE_ERR result = deepCopyConditionInfo(&(src->Conditions[i]), &(dst->Conditions[i]));
+            if (result != SE_SUCCESS) {
+                // Clean up previously allocated memory
+                free(dst->expression);
+                free(dst->Cids);
+                free(dst->Conditions);
+                dst->expression = NULL;
+                dst->Cids = NULL;
+                dst->Conditions = NULL;
+                return result;
+            }
         }
+    } else {
+        dst->Conditions = NULL;
     }
-    
-    // 深拷贝 ActionGs 数组
+
+    // Deep copy ActionGs if necessary
     if (src->ActionGNum > 0 && src->ActionGs != NULL) {
-        dst->ActionGs = (ActionGroup*)malloc(src->ActionGNum * sizeof(ActionGroup));
+        dst->ActionGs = (ActionGroup*)calloc(src->ActionGNum, sizeof(ActionGroup));
         if (dst->ActionGs == NULL) {
-            free(dst->Conditions);
-            free(dst);
-            return NULL;
+            // Clean up previously allocated memory
+            if (dst->expression != NULL) {
+                free(dst->expression);
+                dst->expression = NULL;
+            }
+            if (dst->Cids != NULL) {
+                free(dst->Cids);
+                dst->Cids = NULL;
+            }
+            if (dst->Conditions != NULL) {
+                free(dst->Conditions);
+                dst->Conditions = NULL;
+            }
+            return SE_ERR_OUT_OF_MEMORY;
         }
-        
         for (int i = 0; i < src->ActionGNum; i++) {
-            dst->ActionGs[i] = *DeepCopyActionGroup(&(src->ActionGs[i]));
+            SE_ERR result = deepCopyActionGroup(&(src->ActionGs[i]), &(dst->ActionGs[i]));
+            if (result != SE_SUCCESS) {
+                // Clean up previously allocated memory
+                free(dst->expression);
+                free(dst->Cids);
+                free(dst->ActionGs);
+                dst->expression = NULL;
+                dst->Cids = NULL;
+                dst->ActionGs = NULL;
+                return result;
+            }
         }
+    } else {
+        dst->ActionGs = NULL;
     }
-    
-    return dst;
+
+    return SE_SUCCESS;
 }
+
 
 // 深拷贝 SceneInfo 结构体
 SE_ERR deepCopySceneInfo(const SceneInfo* src, SceneInfo* dst) {
     if (src == NULL || dst == NULL) {
         return SE_ERR_INVALID_ARGUMENT;
     }
-    
-    // 拷贝结构体内容
-    memcpy(dst, src, sizeof(SceneInfo));
-    
-    // 深拷贝 Rules 数组
+
+    // Copy non-pointer members
+    dst->Id = src->Id;
+    dst->Version = src->Version;
+    dst->type = src->type;
+    dst->sceneType = src->sceneType;
+    dst->triggerType = src->triggerType;
+    dst->status = src->status;
+    dst->createTime = src->createTime;
+    dst->updateTime = src->updateTime;
+    dst->protocol_ver = src->protocol_ver;
+    dst->RuleNum = src->RuleNum;
+
+    // Allocate memory for Rules array if necessary
     if (src->RuleNum > 0 && src->Rules != NULL) {
-        dst->Rules = (RuleInfo*)malloc(src->RuleNum * sizeof(RuleInfo));
-        if (dst->Rules == NULL) {
-            return SE_ERR_OUT_OF_MEMORY;
+        bool needFree = false;
+        if( dst->Rules == NULL ) {
+            needFree = true;
+            dst->Rules = (RuleInfo*)calloc(src->RuleNum, sizeof(RuleInfo));
+            if (dst->Rules == NULL) {
+                return SE_ERR_OUT_OF_MEMORY;
+            }
         }
-        
         for (int i = 0; i < src->RuleNum; i++) {
-            dst->Rules[i] = *DeepCopyRuleInfo(&(src->Rules[i]));
+            SE_ERR result = deepCopyRuleInfo(&(src->Rules[i]), &(dst->Rules[i]));
+            if (result != SE_SUCCESS) {
+                // Clean up previously allocated memory
+                if( needFree ) {
+                    free(dst->Rules);
+                    dst->Rules = NULL;
+                }
+                return result;
+            }
         }
+    } else {
+        dst->Rules = NULL;
     }
-    
+
+    // Perform other member copying or allocation if necessary
+
     return SE_SUCCESS;
 }

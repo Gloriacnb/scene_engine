@@ -34,6 +34,12 @@ typedef enum {
 
 }SE_ERR;
 
+//设备ID MAC TempID
+typedef struct {
+    char id[33];
+    char TempId[16];
+    char BleMac[6];
+}DeviceId;
 /******************* 调度器数据结构定义 *********************/
 
 typedef struct _scheduler Scheduler;
@@ -51,6 +57,9 @@ typedef struct {
     uint8_t Operation;
     uint16_t nBytesValue; //value中字节数
     char* value;  //不是字符串，是字节数组
+
+    DeviceId EngineObjDev;
+    DeviceId PairDev;
 }ConditionInfo;
 //动作数据定义
 typedef struct {
@@ -58,6 +67,8 @@ typedef struct {
     uint8_t execute_type;
     uint16_t nBtesActCmd; //ActCmd中字节数
     char* ActCmd; //不是字符串，是字节数组
+    DeviceId EngineObjDev;
+    DeviceId PairDev;
 }ActionInfo;
 
 typedef struct {
@@ -138,12 +149,7 @@ typedef struct
     } data;
 }DevProperties;
 
-//设备ID MAC TempID
-typedef struct {
-    char id[33];
-    char TempId[16];
-    char BleMac[6];
-}DeviceId;
+
 
 // 待配对设备信息
 typedef struct {
@@ -195,7 +201,9 @@ typedef struct
 {
     char SceneName[16];
     uint16_t TriggerDevCnt;
+    DeviceId* TriggerDevs;
     uint16_t ExecutorDevCnt;
+    DeviceId* ExecutorDevs;
 }DeviceInfoList;
 
 typedef struct 

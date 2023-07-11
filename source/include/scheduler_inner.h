@@ -53,7 +53,7 @@ typedef struct _scheduler {
 
 static DeviceId chooseWhereToCreate(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo);
 
-static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, SceneInfo* sinfo);
+static SE_ERR getPresettingSceneConfig(const DeviceInfo* pairDeviceInfo, uint8_t Role, SceneInfo* sinfo);
 
 static SE_ERR isSceneMatch(Scheduler* scheduler, SceneInfo* sinfo);
 
@@ -65,11 +65,14 @@ static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const Device
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
 static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo);
-static SE_ERR unpairAllDevice(Scheduler* scheduler);
+
 static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 
 // static void freeSceneInfo(SceneInfo* sceneInfo);
 SE_ERR deepCopySceneInfo(const SceneInfo* src, SceneInfo* dst);
+
+void copyConditionsId(SceneInfo* info);
+void copyActionsId(SceneInfo* info);
 
 #ifdef __cplusplus
 }

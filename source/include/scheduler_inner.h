@@ -30,6 +30,7 @@ typedef enum {
 }PairState;
 typedef struct _PairStatus {
     DeviceId PairDev;
+    DeviceId SceneObjIn;
     uint8_t Role;
     PairState state;
     struct _PairStatus* next;

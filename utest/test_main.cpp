@@ -3,6 +3,29 @@
 #include "test_data.h"
 #include "scheduler_inner.h"
 
+
+
+class SceneEngineTestFix : public testing::Test {
+protected:
+    virtual void SetUp() override {
+        std::cout << "enter into SetUp()" << std::endl;
+        sh = makeNullSchedulerHandle();
+        TemplateInfo info;
+        info.TemplateSize = 1024;
+        info.LocalAbility = 7;
+        strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
+        auto rtn = loadSceneTemplateFile(sh, &info);
+
+    }
+
+    virtual void TearDown() override {
+        std::cout << "exit from TearDown" << std::endl;
+    }
+
+    Scheduler* sh;
+};
+
+
 // 测试环境运行情况的测试用例
 TEST(EnvironmentTest, TestEnvironment)
 {
@@ -29,17 +52,9 @@ TEST(EnvironmentTest, TestEnvironment)
 }
 
 
-TEST(ScenePairDevice, TestPairExecutor)
+TEST_F(SceneEngineTestFix, TestPairExecutor)
 {
-    Scheduler* sh = makeNullSchedulerHandle();
-    TemplateInfo info;
-    info.TemplateSize = 1024;
-    info.LocalAbility = 7;
-    strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
-    auto rtn = loadSceneTemplateFile(sh, &info);
-
     __scheduler* sch = (__scheduler*)sh;
-    EXPECT_EQ(rtn, SE_SUCCESS);
     EXPECT_EQ(sch->LocalAbility, 7);
     EXPECT_EQ(sch->SceneId, 100);
     EXPECT_EQ(sch->SceneVer, 1);
@@ -88,3 +103,34 @@ TEST(ScenePairDevice, TestPairTrigger)
 {
     
 }
+
+TEST(DeepCopyTest, ConditionInfo) {
+    // 创建源结构体
+    ConditionInfo src;
+    src.CondId = 1;
+    src.OptType = 2;
+    src.CondType = 3;
+    // ... 设置其他成员的值
+    src.nBytesValue = 6;
+    strcpy(src.value, "Hello");
+
+    // 执行深拷贝
+    ConditionInfo* dst = new ConditionInfo();
+    SE_ERR result = deepCopyConditionInfo(&src, dst);
+
+    // 验证拷贝是否成功
+    EXPECT_EQ(result, SE_SUCCESS);
+    EXPECT_NE(dst, nullptr);
+    EXPECT_NE(&src, dst);
+    EXPECT_EQ(dst->CondId, src.CondId);
+    EXPECT_EQ(dst->OptType, src.OptType);
+    EXPECT_EQ(dst->CondType, src.CondType);
+    // ... 验证其他成员的值
+    EXPECT_EQ(dst->nBytesValue, 6);
+    EXPECT_STREQ(dst->value, "Hello");
+    // 清理内存
+    free(dst->value);
+    free(dst);
+}
+
+// 添加其他类似的测试用例

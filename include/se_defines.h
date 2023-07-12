@@ -38,7 +38,7 @@ typedef enum {
 typedef struct {
     char id[33];
     char TempId[16];
-    char BleMac[6];
+    char BleMac[13];
 }DeviceId;
 /******************* 调度器数据结构定义 *********************/
 

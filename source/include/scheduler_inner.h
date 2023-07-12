@@ -70,6 +70,7 @@ static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInf
 
 // static void freeSceneInfo(SceneInfo* sceneInfo);
 SE_ERR deepCopySceneInfo(const SceneInfo* src, SceneInfo* dst);
+SE_ERR deepCopyConditionInfo(const ConditionInfo* src, ConditionInfo* dst);
 
 void copyConditionsId(SceneInfo* info);
 void copyActionsId(SceneInfo* info);

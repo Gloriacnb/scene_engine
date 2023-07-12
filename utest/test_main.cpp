@@ -5,17 +5,26 @@
 #include "scheduler_inner.h"
 
 
-
+static Scheduler* sh = nullptr;
 class SceneEngineTestFix : public testing::Test {
 protected:
-    virtual void SetUp() override {
-        std::cout << "enter into SetUp()" << std::endl;
+
+    static void SetUpTestSuite() {
+        std::cout << "run before first case ..." << std::endl;
+
         sh = makeNullSchedulerHandle();
         TemplateInfo info;
         info.TemplateSize = 1024;
         info.LocalAbility = 7;
         strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
         auto rtn = loadSceneTemplateFile(sh, &info);
+    }
+
+    static void TearDownTestSuite() {
+
+    }
+    virtual void SetUp() override {
+        std::cout << "enter into SetUp()" << std::endl;
 
     }
 
@@ -23,7 +32,7 @@ protected:
         std::cout << "exit from TearDown" << std::endl;
     }
 
-    Scheduler* sh;
+
 };
 
 
@@ -104,6 +113,7 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
 }
 
 TEST_F(SceneEngineTestFix, TestPairTrigger) {
+    __scheduler* sch = (__scheduler*)sh;
     DeviceInfo dev_info;
     strcpy(dev_info.PairDev.id, TRIG_DEV_ID);
     dev_info.devAbility = 0;

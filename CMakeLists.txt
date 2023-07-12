@@ -7,11 +7,17 @@ add_library(scene_engine STATIC
     source/se_scheduler.c
     source/se_trigger.c
     source/uhos_ctlv.c
+    source/uhos_se.c
+    source/uhos_se_common.c
+    utest/uh_k_list.c
+    utest/uh_mutex_posix.c
+    utest/uh_libc_str.c
 )
 
 target_include_directories(scene_engine
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/source/include
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/utest
 )
 
 target_compile_options(scene_engine PRIVATE -Wall -Wextra)

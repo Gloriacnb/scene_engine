@@ -302,7 +302,7 @@ static SE_ERR fillWithTemplateData(Scheduler* scheduler, SceneInfo* sinfo) {
                     ConditionInfo* fillCond = &fillinfo->Conditions[j];
                     assert(fillCond);
                     ConditionInfo* srcCond = getRuleCondition(sourceinfo, fillCond->CondId);
-                    assert(srcCond);
+//                    assert(srcCond);
                     if( srcCond ) {
                         // *fillCond = *srcCond; //@todo 注意这里是浅拷贝，value字段所指向内存没有复制。
                         deepCopyConditionInfo(srcCond, fillCond);

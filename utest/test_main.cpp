@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "se_scheduler.h"
+#include "se_trigger.h"
 #include "test_data.h"
 #include "scheduler_inner.h"
 
@@ -124,12 +125,31 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     rules[1].Conditions[0].CondId = 4;
     rules[1].Conditions[1].CondId = 5;
 
-    TriggerInfo* TriInfo = new ExecutorInfo();
+    //TriggerInfo* TriInfo = new ExecutorInfo();
+    TriggerInfo* TriInfo = new TriggerInfo();
     EXPECT_EQ(pairTriggerDevice(sh, &dev_info, TriInfo), SE_SUCCESS);
     EXPECT_EQ(TriInfo->role, 0);
     EXPECT_STREQ(TriInfo->Obj.id, LOCAL_DEV_ID);
     EXPECT_STREQ(TriInfo->ObjDev.id, TRIG_DEV_ID);
     EXPECT_EQ(TriInfo->TemplateInfo.RuleNum, 2);
+
+	Trigger *  pst_trigger = NULL;
+	pst_trigger = makeNullTriggerHandle();
+    //EXPECT_NE(pst_trigger, NULL);
+    EXPECT_TRUE(NULL != pst_trigger);
+	configResult st_result = {0};
+	EXPECT_EQ(configureTrigger(pst_trigger, TriInfo, &st_result), SE_SUCCESS);
+//	EXPECT_EQ(triggerConfigResultNotification(sh, &st_result), SE_SUCCESS);
+	DevProperties DP = {0};
+	TriggerStatus TS = {0};
+	DP.task_no = 1;
+	DP.type = DevProp_type_epp;
+	unsigned char pEpp1[] = {0xFF,0xFF,0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x06,0x6D,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0x18};
+	DP.data.epp.buf = pEpp1;
+	DP.data.epp.l = sizeof(pEpp1);
+	EXPECT_EQ(evaluateDeviceTriggerConditions(pst_trigger, &DP, &TS), SE_SUCCESS);
+	EXPECT_EQ(evaluateDeviceTriggerConditions(pst_trigger, &DP, &TS), SE_SUCCESS);
+
 }
 TEST(DeepCopyTest, ConditionInfo) {
     // 创建源结构体

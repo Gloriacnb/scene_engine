@@ -2,6 +2,7 @@
 #include "se_trigger.h"
 #include "trigger_inner.h"
 #include <stdlib.h>
+#include "se_uhos_api_inner.h"
 
 
 Trigger* makeNullTriggerHandle(void) {
@@ -26,7 +27,8 @@ SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResul
 
 SE_ERR evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* properties, TriggerStatus* status) {
 
-    return SE_FAILED;
+    //return SE_FAILED;
+    return se_uhos_chkDevCond(trigger, properties, status);
 }
 
 SE_ERR deleteTriggerData(Trigger* trigger, const TriggerInfo* config) {

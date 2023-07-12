@@ -5,6 +5,10 @@
 #include "se_defines.h"
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Trigger* makeNullTriggerHandle(void);
 
 /**
@@ -44,5 +48,7 @@ SE_ERR evaluateDeviceTriggerConditions(Trigger* trigger, const DevProperties* pr
 
 //增加获取trigger对应scheduler device id
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif /* TRIGGER_H */

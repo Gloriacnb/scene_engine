@@ -153,8 +153,11 @@ DeviceInfoList getPairedDeviceList(const Scheduler* scheduler) {
     return deviceList;
 }
 
-SE_ERR unpairAllDevice(Scheduler* scheduler) {
-    // __scheduler* sch = (__scheduler*)scheduler;
+SE_ERR unpairDevice(Scheduler* scheduler, DeviceId dev) {
+    __scheduler* sch = (__scheduler*)scheduler;
+    if( !haveBeenPaired(scheduler, dev) ) {
+        return SE_ERR_INVALID_ARGUMENT;
+    }
     
     return SE_FAILED;
 }

@@ -51,9 +51,7 @@ TEST(EnvironmentTest, TestEnvironment)
 
 }
 
-
-TEST_F(SceneEngineTestFix, TestPairExecutor)
-{
+TEST_F(SceneEngineTestFix, TestLoadTemplate) {
     __scheduler* sch = (__scheduler*)sh;
     EXPECT_EQ(sch->LocalAbility, 7);
     EXPECT_EQ(sch->SceneId, 100);
@@ -66,6 +64,11 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
 
     EXPECT_EQ(sch->TemplateData.Rules[0].Conditions[0].CondId, 1);
     EXPECT_EQ(sch->TemplateData.Rules[1].Conditions[0].CondId, 4);
+}
+TEST_F(SceneEngineTestFix, TestPairExecutor)
+{
+    __scheduler* sch = (__scheduler*)sh;
+
 
     DeviceInfo dev_info;
     strcpy(dev_info.PairDev.id, EXEC_DEV_ID);
@@ -99,11 +102,35 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
 
 }
 
-TEST(ScenePairDevice, TestPairTrigger)
-{
-    
-}
+TEST_F(SceneEngineTestFix, TestPairTrigger) {
+    DeviceInfo dev_info;
+    strcpy(dev_info.PairDev.id, TRIG_DEV_ID);
+    dev_info.devAbility = 0;
+    dev_info.presetting_type = 1;
+    dev_info.block.Tinfo.Id = 100;
+    dev_info.block.Tinfo.Version = 1;
+    dev_info.block.Tinfo.RuleNum = 2;
+    dev_info.block.Tinfo.Rules = new RuleInfo[2]();
+    RuleInfo* rules = dev_info.block.Tinfo.Rules;
+    rules[0].RuleId = 100;
+    rules[0].ConditionNum = 2;
+    rules[0].Conditions = new ConditionInfo[2]();
+    rules[0].Conditions[0].CondId = 1;
+    rules[0].Conditions[1].CondId = 2;
 
+    rules[1].RuleId = 110;
+    rules[1].ConditionNum = 2;
+    rules[1].Conditions = new ConditionInfo[2]();
+    rules[1].Conditions[0].CondId = 4;
+    rules[1].Conditions[1].CondId = 5;
+
+    TriggerInfo* TriInfo = new ExecutorInfo();
+    EXPECT_EQ(pairTriggerDevice(sh, &dev_info, TriInfo), SE_SUCCESS);
+    EXPECT_EQ(TriInfo->role, 0);
+    EXPECT_STREQ(TriInfo->Obj.id, LOCAL_DEV_ID);
+    EXPECT_STREQ(TriInfo->ObjDev.id, TRIG_DEV_ID);
+    EXPECT_EQ(TriInfo->TemplateInfo.RuleNum, 2);
+}
 TEST(DeepCopyTest, ConditionInfo) {
     // 创建源结构体
     ConditionInfo src;
@@ -112,6 +139,7 @@ TEST(DeepCopyTest, ConditionInfo) {
     src.CondType = 3;
     // ... 设置其他成员的值
     src.nBytesValue = 6;
+    src.value = new char[6];
     strcpy(src.value, "Hello");
 
     // 执行深拷贝

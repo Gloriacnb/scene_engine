@@ -34,6 +34,8 @@ add_executable(unit_tests
     utest/test_port.cpp
 )
 
+target_compile_options(unit_tests PRIVATE -Wall)
+
 target_link_libraries(unit_tests
     PRIVATE scene_engine
     PRIVATE gtest_main

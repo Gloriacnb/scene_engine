@@ -25,6 +25,7 @@ target_compile_options(scene_engine PRIVATE -Wall -Wextra)
 target_compile_definitions(scene_engine
     PRIVATE NO_DEBUG_TLV
     PRIVATE NOT_BUILD_IN_UHOS
+    PRIVATE NO_DEBUG_LOG
 )
 
 # 编译单元测试

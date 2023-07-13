@@ -65,7 +65,7 @@ static SE_ERR addPairStatus(PairStatus** head, const DeviceId* deviceId, uint8_t
 static PairStatus* findPairStatusByDeviceId(const PairStatus* head, const DeviceId* deviceId);
 static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId);
 // static PairStatus* removePairStatusByDeviceId(PairStatus** head, const DeviceId* deviceId);
-static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo);
+static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, SceneObject* executorInfo);
 
 static SE_ERR parseTLV(const uint8_t* data, uint16_t length, SceneInfo* sceneInfo);
 

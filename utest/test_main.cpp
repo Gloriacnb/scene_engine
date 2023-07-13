@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "se_scheduler.h"
 #include "se_trigger.h"
+#include "se_executor.h"
 #include "test_data.h"
 #include "scheduler_inner.h"
 
@@ -115,23 +116,37 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
     EXPECT_STREQ(sch->PairDevList->PairDev.id, EXEC_DEV_ID);
     EXPECT_EQ(sch->PairDevList->next, nullptr);
     EXPECT_EQ(sch->PairDevList->Role, 1);
-    configResult CfgRslt;
-    strcpy(CfgRslt.ConfiguredDev.id, EXEC_DEV_ID);
-    CfgRslt.Result = SE_SUCCESS;
-    executorConfigResultNotification(sh, &CfgRslt);
+    EXPECT_EQ(sch->PairDevList->state, PAIRED);
+
+    configResult* CfgRslt = new configResult();
+    Executor* exe = makeNullExecutorHandle();
+    configureExecutor(exe, ExeInfo, CfgRslt);
+    EXPECT_STREQ(CfgRslt->ConfiguredDev.id, EXEC_DEV_ID);
+    EXPECT_EQ(CfgRslt->Result, SE_SUCCESS);
+    executorConfigResultNotification(sh, CfgRslt);
+
+    EXPECT_EQ(sch->PairDevList->state, SYNCED);
+
+    DeviceInfoList InfoList = getPairedDeviceList(sh);
+    EXPECT_EQ(InfoList.ExecutorDevCnt, 1);
+    EXPECT_EQ(InfoList.TriggerDevCnt, 0);
+
+    delete CfgRslt;
+    delete ExeInfo;
+
 }
 
 TEST_F(SceneEngineTestFix, TestPairTrigger) {
     __scheduler* sch = (__scheduler*)sh;
-    DeviceInfo dev_info;
-    strcpy(dev_info.PairDev.id, TRIG_DEV_ID);
-    dev_info.devAbility = 0;
-    dev_info.presetting_type = 1;
-    dev_info.block.Tinfo.Id = 100;
-    dev_info.block.Tinfo.Version = 1;
-    dev_info.block.Tinfo.RuleNum = 2;
-    dev_info.block.Tinfo.Rules = new RuleInfo[2]();
-    RuleInfo* rules = dev_info.block.Tinfo.Rules;
+    DeviceInfo dev_Trigger;
+    strcpy(dev_Trigger.PairDev.id, TRIG_DEV_ID);
+    dev_Trigger.devAbility = 0;
+    dev_Trigger.presetting_type = 1;
+    dev_Trigger.block.Tinfo.Id = 100;
+    dev_Trigger.block.Tinfo.Version = 1;
+    dev_Trigger.block.Tinfo.RuleNum = 2;
+    dev_Trigger.block.Tinfo.Rules = new RuleInfo[2]();
+    RuleInfo* rules = dev_Trigger.block.Tinfo.Rules;
     rules[0].RuleId = 100;
     rules[0].ConditionNum = 2;
     rules[0].Conditions = new ConditionInfo[2]();
@@ -144,9 +159,8 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     rules[1].Conditions[0].CondId = 4;
     rules[1].Conditions[1].CondId = 5;
 
-    //TriggerInfo* TriInfo = new ExecutorInfo();
     TriggerInfo* TriInfo = new TriggerInfo();
-    EXPECT_EQ(pairTriggerDevice(sh, &dev_info, TriInfo), SE_SUCCESS);
+    EXPECT_EQ(pairTriggerDevice(sh, &dev_Trigger, TriInfo), SE_SUCCESS);
     EXPECT_EQ(TriInfo->role, 0);
     EXPECT_STREQ(TriInfo->Obj.id, LOCAL_DEV_ID);
     EXPECT_STREQ(TriInfo->ObjDev.id, TRIG_DEV_ID);
@@ -156,22 +170,18 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     EXPECT_NE(sch->PairDevList->next, nullptr);
     EXPECT_STREQ(sch->PairDevList->next->PairDev.id, TRIG_DEV_ID);
     EXPECT_EQ(sch->PairDevList->next->Role, 0);
+    EXPECT_EQ(sch->PairDevList->next->state, PAIRED);
 
+	Trigger* pst_trigger = makeNullTriggerHandle();
 
-
-    configResult rslt;
-    strcpy(rslt.ConfiguredDev.id, TRIG_DEV_ID);
-    strcpy(rslt.NotifiedDev.id, LOCAL_DEV_ID);
-    rslt.Result = SE_SUCCESS;
-    EXPECT_EQ(executorConfigResultNotification(sh, &rslt), SE_SUCCESS);
-
-	Trigger *  pst_trigger = NULL;
-	pst_trigger = makeNullTriggerHandle();
-    //EXPECT_NE(pst_trigger, NULL);
     EXPECT_TRUE(NULL != pst_trigger);
-	configResult st_result = {0};
-	EXPECT_EQ(configureTrigger(pst_trigger, TriInfo, &st_result), SE_SUCCESS);
-	EXPECT_EQ(triggerConfigResultNotification(sh, &st_result), SE_SUCCESS);
+	configResult* st_result = new configResult();
+	EXPECT_EQ(configureTrigger(pst_trigger, TriInfo, st_result), SE_SUCCESS);
+    EXPECT_STREQ(st_result->ConfiguredDev.id, TRIG_DEV_ID);
+    EXPECT_EQ(st_result->Result, SE_SUCCESS);
+	EXPECT_EQ(triggerConfigResultNotification(sh, st_result), SE_SUCCESS);
+
+    EXPECT_EQ(sch->PairDevList->next->state, SYNCED);
 
     DeviceInfoList InfoList = getPairedDeviceList(sh);
     EXPECT_EQ(InfoList.ExecutorDevCnt, 1);

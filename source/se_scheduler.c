@@ -51,7 +51,7 @@ SE_ERR isPairingDeviceMatchScene(Scheduler* scheduler, uint16_t sceneId, uint16_
     return SE_FAILED;    
 }
 
-static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, ExecutorInfo* executorInfo) {    
+static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, uint8_t Role, SceneObject* executorInfo) {    
     // 检查调度器和设备信息是否为空
     if (scheduler == NULL || pairDeviceInfo == NULL || executorInfo == NULL) {
         return SE_FAILED;

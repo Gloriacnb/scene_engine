@@ -3,6 +3,10 @@
 
 #include "se_defines.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Executor* makeNullExecutorHandle(void);
 
 /**
@@ -48,4 +52,9 @@ SE_ERR controlResultReport(Executor* executor, const ControlResult* result);
         - executor：执行器实例
         - result：控制结果
 */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* EXECUTOR_H */

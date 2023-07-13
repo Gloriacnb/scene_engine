@@ -19,7 +19,7 @@ SE_ERR configureTrigger(Trigger* trigger, const TriggerInfo* config, configResul
     trig->TriggerDev = config->ObjDev;
     trig->SceneData = config->TemplateInfo; //@todo 这里只做了浅拷贝，如果使用有问题再修改
 
-    result->ConfiguredDev = trig->Trigger;
+    result->ConfiguredDev = trig->TriggerDev;
     result->NotifiedDev = trig->Scheduler;
     result->Result = SE_SUCCESS;
     return SE_SUCCESS;

@@ -108,7 +108,7 @@ SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult
     }
     __scheduler* sch = (__scheduler*)scheduler;
     PairStatus* st = findPairStatusByDeviceId(sch->PairDevList, &configResult->ConfiguredDev);
-    if(st && (st->state == PAIRED) ) {
+    if( st ) {
         st->state = SYNCED;
         return SE_SUCCESS;
     }
@@ -387,7 +387,9 @@ static bool isDeviceIdInList(const PairStatus* head, const DeviceId* deviceId) {
     const PairStatus* current = head;
 
     while (current != NULL) {
-        if (strcmp(current->PairDev.id, deviceId->id) == 0) {
+        if (strcmp(current->PairDev.id, deviceId->id) == 0
+            || strcmp(current->PairDev.TempId, deviceId->TempId) == 0 
+            || strcmp(current->PairDev.BleMac, deviceId->BleMac) == 0 ) {
             return true;  // 找到匹配的节点
         }
         current = current->next;

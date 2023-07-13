@@ -18,6 +18,7 @@ protected:
         info.LocalAbility = 7;
         strcpy(info.LocalDevId.id, LOCAL_DEV_ID);
         auto rtn = loadSceneTemplateFile(sh, &info);
+        EXPECT_EQ(rtn, SE_SUCCESS);
     }
 
     static void TearDownTestSuite() {
@@ -82,7 +83,7 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
 
     DeviceInfo dev_info;
     strcpy(dev_info.PairDev.id, EXEC_DEV_ID);
-    dev_info.devAbility = 0;
+    dev_info.devAbility = 7;
     dev_info.presetting_type = 1;
     dev_info.block.Tinfo.Id = 100;
     dev_info.block.Tinfo.Version = 1;
@@ -114,6 +115,10 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
     EXPECT_STREQ(sch->PairDevList->PairDev.id, EXEC_DEV_ID);
     EXPECT_EQ(sch->PairDevList->next, nullptr);
     EXPECT_EQ(sch->PairDevList->Role, 1);
+    configResult CfgRslt;
+    strcpy(CfgRslt.ConfiguredDev.id, EXEC_DEV_ID);
+    CfgRslt.Result = SE_SUCCESS;
+    executorConfigResultNotification(sh, &CfgRslt);
 }
 
 TEST_F(SceneEngineTestFix, TestPairTrigger) {
@@ -152,6 +157,8 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     EXPECT_STREQ(sch->PairDevList->next->PairDev.id, TRIG_DEV_ID);
     EXPECT_EQ(sch->PairDevList->next->Role, 0);
 
+
+
     configResult rslt;
     strcpy(rslt.ConfiguredDev.id, TRIG_DEV_ID);
     strcpy(rslt.NotifiedDev.id, LOCAL_DEV_ID);
@@ -164,7 +171,12 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     EXPECT_TRUE(NULL != pst_trigger);
 	configResult st_result = {0};
 	EXPECT_EQ(configureTrigger(pst_trigger, TriInfo, &st_result), SE_SUCCESS);
-//	EXPECT_EQ(triggerConfigResultNotification(sh, &st_result), SE_SUCCESS);
+	EXPECT_EQ(triggerConfigResultNotification(sh, &st_result), SE_SUCCESS);
+
+    DeviceInfoList InfoList = getPairedDeviceList(sh);
+    EXPECT_EQ(InfoList.ExecutorDevCnt, 1);
+    EXPECT_EQ(InfoList.TriggerDevCnt, 1);
+
 	DevProperties DP = {0};
 	TriggerStatus TS = {0};
 	DP.task_no = 1;

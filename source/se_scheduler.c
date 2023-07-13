@@ -91,8 +91,7 @@ static SE_ERR pairDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo,
     executorInfo->ObjDev = pairDeviceInfo->PairDev;
     executorInfo->Scheduler = sch->LocalDev;
 
-    addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, Role, PAIRED);
-    return SE_SUCCESS;
+    return addPairStatus(&sch->PairDevList, &pairDeviceInfo->PairDev, Role, PAIRED);
 }
 
 SE_ERR pairExecutorDevice(Scheduler* scheduler, const DeviceInfo* pairDeviceInfo, ExecutorInfo* executorInfo) {
@@ -111,6 +110,7 @@ SE_ERR executorConfigResultNotification(Scheduler* scheduler, const configResult
     PairStatus* st = findPairStatusByDeviceId(sch->PairDevList, &configResult->ConfiguredDev);
     if(st && (st->state == PAIRED) ) {
         st->state = SYNCED;
+        return SE_SUCCESS;
     }
     return SE_FAILED;
 }
@@ -153,8 +153,11 @@ DeviceInfoList getPairedDeviceList(const Scheduler* scheduler) {
     return deviceList;
 }
 
-SE_ERR unpairAllDevice(Scheduler* scheduler) {
-    // __scheduler* sch = (__scheduler*)scheduler;
+SE_ERR unpairDevice(Scheduler* scheduler, DeviceId dev) {
+    __scheduler* sch = (__scheduler*)scheduler;
+    if( !haveBeenPaired(scheduler, &dev) ) {
+        return SE_ERR_INVALID_ARGUMENT;
+    }
     
     return SE_FAILED;
 }

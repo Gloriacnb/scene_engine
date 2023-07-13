@@ -86,7 +86,7 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
     dev_info.presetting_type = 1;
     dev_info.block.Tinfo.Id = 100;
     dev_info.block.Tinfo.Version = 1;
-    dev_info.block.Tinfo.RuleNum = 1;
+    dev_info.block.Tinfo.RuleNum = 2;
     dev_info.block.Tinfo.Rules = new RuleInfo[2]();
     RuleInfo* rules = dev_info.block.Tinfo.Rules;
     rules[0].RuleId = 100;
@@ -107,9 +107,13 @@ TEST_F(SceneEngineTestFix, TestPairExecutor)
     EXPECT_EQ(ExeInfo->role, 1);
     EXPECT_STREQ(ExeInfo->Obj.id, LOCAL_DEV_ID);
     EXPECT_STREQ(ExeInfo->ObjDev.id, EXEC_DEV_ID);
-    EXPECT_EQ(ExeInfo->TemplateInfo.RuleNum, 1);
-    // EXPECT_EQ(ExeInfo->TemplateInfo.Rules[1].RuleId, 110);
+    EXPECT_EQ(ExeInfo->TemplateInfo.RuleNum, 2);
+    EXPECT_EQ(ExeInfo->TemplateInfo.Rules[1].RuleId, 110);
 
+    EXPECT_NE(sch->PairDevList, nullptr);
+    EXPECT_STREQ(sch->PairDevList->PairDev.id, EXEC_DEV_ID);
+    EXPECT_EQ(sch->PairDevList->next, nullptr);
+    EXPECT_EQ(sch->PairDevList->Role, 1);
 }
 
 TEST_F(SceneEngineTestFix, TestPairTrigger) {
@@ -142,6 +146,17 @@ TEST_F(SceneEngineTestFix, TestPairTrigger) {
     EXPECT_STREQ(TriInfo->Obj.id, LOCAL_DEV_ID);
     EXPECT_STREQ(TriInfo->ObjDev.id, TRIG_DEV_ID);
     EXPECT_EQ(TriInfo->TemplateInfo.RuleNum, 2);
+
+    EXPECT_NE(sch->PairDevList, nullptr);
+    EXPECT_NE(sch->PairDevList->next, nullptr);
+    EXPECT_STREQ(sch->PairDevList->next->PairDev.id, TRIG_DEV_ID);
+    EXPECT_EQ(sch->PairDevList->next->Role, 0);
+
+    configResult rslt;
+    strcpy(rslt.ConfiguredDev.id, TRIG_DEV_ID);
+    strcpy(rslt.NotifiedDev.id, LOCAL_DEV_ID);
+    rslt.Result = SE_SUCCESS;
+    EXPECT_EQ(executorConfigResultNotification(sh, &rslt), SE_SUCCESS);
 
 	Trigger *  pst_trigger = NULL;
 	pst_trigger = makeNullTriggerHandle();

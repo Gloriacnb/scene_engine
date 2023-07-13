@@ -49,9 +49,14 @@ static uhos_u32 isvalid_epp(const byte_t *pEpp)
 	//len
 	sum = epp_len;
 	//addr
-    for(i=3,j=0; j<EPP_ADDR_LEN; j++) {
+	for(i=3,j=0; (j<EPP_ADDR_LEN) && (i<pEpp->l); j++) {
 		sum += pEpp->buf[i];
 		if(EPP_HEAD == pEpp->buf[i]) {
+			if((i+1) >= pEpp->l) {
+				UHPT_LOGE("No enough data: i %d, l %d, need more.",
+					i+1, pEpp->l);
+				return uret;
+			}
 			if(EPP_TRAN_BYTE != pEpp->buf[i+1]) {
 				UHPT_LOGE("invalid EPP: i %d, FF need 55, but 0x%x.",
 					i, pEpp->buf[i+1]);
@@ -63,27 +68,38 @@ static uhos_u32 isvalid_epp(const byte_t *pEpp)
 		}
 		i++;
 	}
-    j ++; //since the len is not counted
+	j ++; //since the len is not counted
 
 	//frameType
+	if(i >= pEpp->l) {
+		UHPT_LOGE("No enough data: i %d, l %d, need more.",
+			i, pEpp->l);
+		return uret;
+	}
 	if(EPP_HEAD == pEpp->buf[i] || 0 == pEpp->buf[i]) {
 		UHPT_LOGE("invalid EPP: frameType in %d shall not be 0xff/0x00.", i);
 		return uret;
 	}
 	sum += pEpp->buf[i++];
 	j ++;
+
 	//data
 	for(; j<epp_len && i<pEpp->l; j++) {
 		sum += pEpp->buf[i];
 		if(EPP_HEAD == pEpp->buf[i]) {
+			if((i+1) >= pEpp->l) {
+				UHPT_LOGE("No enough data: i %d, l %d, need more.",
+					i+1, pEpp->l);
+				return uret;
+			}
 			if(EPP_TRAN_BYTE != pEpp->buf[i+1]) {
-                UHPT_LOGE("invalid EPP: i %d, FF need 55, but 0x%x.",
-                    i, pEpp->buf[i+1]);
-                return uret;
-            }
-            sum += EPP_TRAN_BYTE;
-            i++;
-            uff55_l ++;
+				UHPT_LOGE("invalid EPP: i %d, FF need 55, but 0x%x.",
+					i, pEpp->buf[i+1]);
+				return uret;
+			}
+			sum += EPP_TRAN_BYTE;
+			i++;
+			uff55_l ++;
 		}
 		i++;
 	}
@@ -101,12 +117,13 @@ static uhos_u32 isvalid_epp(const byte_t *pEpp)
 
 	if(EPP_HEAD == pEpp->buf[i]) {
 		i++;
-		if(i<pEpp->l && EPP_TRAN_BYTE == pEpp->buf[i]) {
+		if((i < pEpp->l) && (EPP_TRAN_BYTE == pEpp->buf[i])) {
 			UHPT_LOGD("chksum 0xff with 55.");
 		} else {
 			UHPT_LOGE("chksum 0xff, but i %d l %d", i, pEpp->l);
-			if(i<pEpp->l)
-				UHPT_LOGE("no 55, but 0x%x.", pEpp->buf[i]);
+			if(i < pEpp->l) {
+				UHPT_LOGE(" no 55, but 0x%x.", pEpp->buf[i]);
+			}
 			UHPT_LOGE("But SKIP!!!");
 		}
 	}
